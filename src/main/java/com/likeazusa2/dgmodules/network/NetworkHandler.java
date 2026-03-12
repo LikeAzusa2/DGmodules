@@ -59,6 +59,12 @@ public class NetworkHandler {
                 S2CPhaseShieldLoopSound::handle
         );
 
+        registrar.playToClient(
+                S2CCataclysmShockwave.TYPE,
+                S2CCataclysmShockwave.STREAM_CODEC,
+                S2CCataclysmShockwave::handle
+        );
+
     }
 
     public static void sendToServer(CustomPacketPayload payload) {
