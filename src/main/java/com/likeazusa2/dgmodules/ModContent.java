@@ -6,6 +6,11 @@ import com.brandon3055.draconicevolution.init.DEModules;
 import com.likeazusa2.dgmodules.blocks.DontIgniteBlock;
 import com.likeazusa2.dgmodules.blocks.DontIgniteBlockEntity;
 import com.likeazusa2.dgmodules.modules.*;
+import com.likeazusa2.dgmodules.entity.DomeEmitterProjectileEntity;
+import com.likeazusa2.dgmodules.entity.DraconicShieldDomeCoreEntity;
+import com.likeazusa2.dgmodules.item.DraconicShieldDomeEmitterItem;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -29,7 +34,10 @@ public class ModContent {
     public static final DeferredRegister<net.minecraft.world.level.block.entity.BlockEntityType<?>> BLOCK_ENTITIES =
             DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, DGModules.MODID);
 
-public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS =
+    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
+            DeferredRegister.create(Registries.ENTITY_TYPE, DGModules.MODID);
+
+    public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, DGModules.MODID);
 
     // 关键：模块注册（用 DE 的 MODULE_KEY）
@@ -88,9 +96,32 @@ public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS =
         ITEMS.register(modBus);
         BLOCKS.register(modBus);
         BLOCK_ENTITIES.register(modBus);
+        ENTITY_TYPES.register(modBus);
         DG_MODULES.register(modBus);
         CREATIVE_TABS.register(modBus);
     }
+    public static final DeferredHolder<Item, DraconicShieldDomeEmitterItem> DRACONIC_SHIELD_DOME_EMITTER =
+            ITEMS.register("draconic_shield_dome_emitter",
+                    () -> new DraconicShieldDomeEmitterItem(new Item.Properties().stacksTo(16))
+            );
+
+    public static final DeferredHolder<EntityType<?>, EntityType<DomeEmitterProjectileEntity>> DOME_EMITTER_PROJECTILE =
+            ENTITY_TYPES.register("dome_emitter_projectile",
+                    () -> EntityType.Builder.<DomeEmitterProjectileEntity>of(DomeEmitterProjectileEntity::new, MobCategory.MISC)
+                            .sized(0.25F, 0.25F)
+                            .clientTrackingRange(4)
+                            .updateInterval(10)
+                            .build("dome_emitter_projectile")
+            );
+
+    public static final DeferredHolder<EntityType<?>, EntityType<DraconicShieldDomeCoreEntity>> DOME_CORE =
+            ENTITY_TYPES.register("draconic_shield_dome_core",
+                    () -> EntityType.Builder.<DraconicShieldDomeCoreEntity>of(DraconicShieldDomeCoreEntity::new, MobCategory.MISC)
+                            .sized(0.95F, 1.95F)
+                            .clientTrackingRange(8)
+                            .updateInterval(1)
+                            .build("draconic_shield_dome_core")
+            );
     // ===== Dragon Guard =====
 
     public static final DeferredHolder<Item, DragonGuardModuleItem> DRAGON_GUARD_MODULE_ITEM =
@@ -309,7 +340,20 @@ public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS =
     private static Module<?> getCompressedChaoticSpeedModule() {
         return COMPRESSED_CHAOTIC_SPEED_MODULE.get();
     }
+    // ===== Frame Breaker =====
+    public static final DeferredHolder<Item, FrameBreakerModuleItem> FRAME_BREAKER_MODULE_ITEM =
+            ITEMS.register("frame_breaker_module",
+                    () -> new FrameBreakerModuleItem(new Item.Properties(), ModContent::getFrameBreakerModule)
+            );
 
+    public static final DeferredHolder<Module<?>, FrameBreakerModule> FRAME_BREAKER_MODULE =
+            DG_MODULES.register("frame_breaker",
+                    () -> new FrameBreakerModule(FRAME_BREAKER_MODULE_ITEM.get())
+            );
+
+    private static Module<?> getFrameBreakerModule() {
+        return FRAME_BREAKER_MODULE.get();
+    }
 public static final DeferredHolder<CreativeModeTab, CreativeModeTab> DG_MODULES_TAB =
             CREATIVE_TABS.register("dgmodules_tab", () ->
                     CreativeModeTab.builder()
@@ -332,6 +376,8 @@ public static final DeferredHolder<CreativeModeTab, CreativeModeTab> DG_MODULES_
                                 output.accept(COMPRESSED_CHAOTIC_DAMAGE_MODULE_ITEM.get());
                                 output.accept(COMPRESSED_CHAOTIC_SPEED_MODULE_ITEM.get());
                                 output.accept(CATACLYSM_ARROW_MODULE_ITEM.get());
+                                output.accept(FRAME_BREAKER_MODULE_ITEM.get());
+                                output.accept(DRACONIC_SHIELD_DOME_EMITTER.get());
                             })
                             .build()
             );

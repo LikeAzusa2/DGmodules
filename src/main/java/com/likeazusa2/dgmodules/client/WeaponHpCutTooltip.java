@@ -2,14 +2,18 @@ package com.likeazusa2.dgmodules.client;
 
 import com.brandon3055.draconicevolution.api.capability.DECapabilities;
 import com.brandon3055.draconicevolution.api.capability.ModuleHost;
+import com.likeazusa2.dgmodules.DGModules;
 import com.likeazusa2.dgmodules.modules.CurrentHpDamageModule;
 import com.likeazusa2.dgmodules.modules.CurrentHpDamageModuleType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
+@EventBusSubscriber(modid = DGModules.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class WeaponHpCutTooltip {
 
 

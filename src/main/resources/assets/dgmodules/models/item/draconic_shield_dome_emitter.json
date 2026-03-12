@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "dgmodules:item/draconic_shield_dome_emitter"
+  }
+}

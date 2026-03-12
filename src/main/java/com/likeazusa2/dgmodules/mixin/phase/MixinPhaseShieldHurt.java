@@ -1,5 +1,6 @@
 package com.likeazusa2.dgmodules.mixin.phase;
 
+import com.likeazusa2.dgmodules.DGModules;
 import com.likeazusa2.dgmodules.logic.PhaseShieldLogic;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -11,22 +12,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * 相位护盾最底层拦截：
- * - 已开启：直接吞 hurt / setHealth(降血) / die / kill（仿“混沌守卫无敌”）
- * - 未开启：仅在“明显致死”的情况下应急开启后再吞（避免普通小伤害也自动开盾）
+ * Phase Shield lowest-level interception.
  */
 @Mixin(LivingEntity.class)
 public abstract class MixinPhaseShieldHurt {
 
     @Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
     private void dg$hurt(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        LivingEntity self = (LivingEntity)(Object)this;
+        LivingEntity self = (LivingEntity) (Object) this;
         if (self.level().isClientSide) return;
         if (!(self instanceof ServerPlayer sp)) return;
 
         if (PhaseShieldLogic.isActive(sp)) {
             PhaseShieldLogic.playShieldHit(sp);
-            cir.setReturnValue(false); // 无受击动画
+            cir.setReturnValue(false);
         }
     }
 
@@ -37,38 +36,52 @@ public abstract class MixinPhaseShieldHurt {
         if (!(self instanceof ServerPlayer sp)) return;
 
         float cur = self.getHealth();
-        if (newHealth >= cur) return; // 不是掉血就别管
+        if (newHealth >= cur) return;
 
         boolean active = PhaseShieldLogic.isActive(sp);
         boolean lethal = newHealth <= 0.0F;
+        DGModules.LOGGER.info(
+                "[PhaseShield] MixinPhaseShieldHurt#setHealth player={} cur={} new={} lethal={} active={}",
+                sp.getGameProfile().getName(),
+                cur,
+                newHealth,
+                lethal,
+                active
+        );
 
         if (active || (lethal && PhaseShieldLogic.tryActivateEmergency(sp))) {
             PhaseShieldLogic.playShieldHit(sp);
-            ci.cancel(); // 拦掉 setHealth 掉血
-        }
-    }
-
-    @Inject(method = "die", at = @At("HEAD"), cancellable = true)
-    private void dg$die(DamageSource source, CallbackInfo ci) {
-        LivingEntity self = (LivingEntity) (Object) this;
-        if (self.level().isClientSide) return;
-        if (!(self instanceof ServerPlayer sp)) return;
-
-        if (PhaseShieldLogic.isActive(sp) || PhaseShieldLogic.tryActivateEmergency(sp)) {
-            PhaseShieldLogic.playShieldHit(sp);
+            if (lethal || active) {
+                PhaseShieldLogic.stabilizeAfterDeathIntercept(sp);
+            }
+            DGModules.LOGGER.info(
+                    "[PhaseShield] MixinPhaseShieldHurt#setHealth canceled player={} lethal={} active={}",
+                    sp.getGameProfile().getName(),
+                    lethal,
+                    active
+            );
             ci.cancel();
         }
     }
 
-    @Inject(method = "kill", at = @At("HEAD"), cancellable = true, require = 0)
-    private void dg$kill(CallbackInfo ci) {
+    @Inject(method = "tickDeath", at = @At("HEAD"), cancellable = true, require = 0)
+    private void dg$tickDeath(CallbackInfo ci) {
         LivingEntity self = (LivingEntity) (Object) this;
         if (self.level().isClientSide) return;
         if (!(self instanceof ServerPlayer sp)) return;
 
-        if (PhaseShieldLogic.isActive(sp) || PhaseShieldLogic.tryActivateEmergency(sp)) {
-            PhaseShieldLogic.playShieldHit(sp);
+        DGModules.LOGGER.info(
+                "[PhaseShield] MixinPhaseShieldHurt#tickDeath player={} hp={} deathTime={} active={}",
+                sp.getGameProfile().getName(),
+                sp.getHealth(),
+                sp.deathTime,
+                PhaseShieldLogic.isActive(sp)
+        );
+        if (PhaseShieldLogic.tryInterceptLethalOperation(sp)) {
+            DGModules.LOGGER.info("[PhaseShield] MixinPhaseShieldHurt#tickDeath canceled player={}", sp.getGameProfile().getName());
             ci.cancel();
         }
     }
+
 }
+

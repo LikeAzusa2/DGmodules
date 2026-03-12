@@ -1,8 +1,10 @@
 package com.likeazusa2.dgmodules;
 
 import com.brandon3055.draconicevolution.init.DEModules;
+import com.likeazusa2.dgmodules.client.WeaponHpCutTooltip;
 import com.likeazusa2.dgmodules.logic.ServerTickHandler;
 import com.likeazusa2.dgmodules.network.NetworkHandler;
+import com.likeazusa2.dgmodules.logic.DraconicShieldDomeEvents;
 import com.mojang.logging.LogUtils;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -60,7 +62,7 @@ public class DGModules {
         // 7) 服务端 tick（放到 NeoForge EVENT_BUS）
         // =========================================================
         NeoForge.EVENT_BUS.register(ServerTickHandler.class);
-
+        NeoForge.EVENT_BUS.register(DraconicShieldDomeEvents.class);
         // =========================================================
         // 8) 客户端初始化（只在客户端执行）
         // =========================================================
@@ -83,6 +85,7 @@ public class DGModules {
      */
     private static class ClientOnly {
         static void init(IEventBus modBus) {
+            NeoForge.EVENT_BUS.register(WeaponHpCutTooltip.class);
         }
     }
 }

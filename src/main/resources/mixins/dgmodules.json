@@ -1,16 +1,23 @@
 {
-  "required": true,
-  "package": "com.likeazusa2.dgmodules.mixin",
-  "compatibilityLevel": "JAVA_21",
-  "mixins": [
-    "MixinChaoticStaffHost",
-    "MixinShieldControlEntity",
-    "MixinModuleEntityHostAccess",
+    "required":  true,
+    "package":  "com.likeazusa2.dgmodules.mixin",
+    "compatibilityLevel":  "JAVA_21",
+    "mixins":  [
+                   "frame.MixinFrameBreakerLivingHurt",
+                   "MixinChaoticStaffHost",
+                   "MixinShieldControlEntity",
+                   "MixinModuleEntityHostAccess",
+                   "phase.MixinPhaseShieldBlockDamageLeftClickItem",
+                   "phase.MixinPhaseShieldPickable",
+                   "phase.MixinPhaseShieldPlayerAttack",
+                   "phase.MixinPhaseShieldHurt",
+                   "phase.MixinPhaseShieldServerPlayerDeath",
+                   "phase.MixinPhaseShieldEntityRemoval"
+               ],
+    "client":  [
+                   "client.MixinModularChestpieceModelRenderContext"
+               ],
+    "server":  [
 
-    "phase.MixinPhaseShieldHurt",
-    "phase.MixinPhaseShieldBlockDamageLeftClickItem",
-    "phase.MixinPhaseShieldPickable"
-  ],
-  "client": ["client.MixinModularChestpieceModelRenderContext"],
-  "server": []
+               ]
 }

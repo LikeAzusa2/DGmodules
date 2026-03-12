@@ -37,7 +37,8 @@ public class DGCapabilities {
                 ModContent.COMPRESSED_CHAOTIC_DAMAGE_MODULE_ITEM.get(),
                 ModContent.COMPRESSED_CHAOTIC_SPEED_MODULE_ITEM.get(),
                 ModContent.PHASE_SHIELD_MODULE_ITEM.get(),
-                ModContent.CATACLYSM_ARROW_MODULE_ITEM.get()
+                ModContent.CATACLYSM_ARROW_MODULE_ITEM.get(),
+                ModContent.FRAME_BREAKER_MODULE_ITEM.get()
         );
     }
 

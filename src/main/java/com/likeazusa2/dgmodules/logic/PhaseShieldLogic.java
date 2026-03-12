@@ -14,9 +14,14 @@ import com.likeazusa2.dgmodules.modules.PhaseShieldModuleEntity;
 import com.likeazusa2.dgmodules.modules.ShieldControlBoosterModuleEntity;
 import com.likeazusa2.dgmodules.network.NetworkHandler;
 import com.likeazusa2.dgmodules.network.S2CPhaseShieldState;
+import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.ModList;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -26,6 +31,12 @@ public class PhaseShieldLogic {
     private static final String TAG_ACTIVE = "dg_phase_shield_active";
     private static final String TAG_LAST_SYNC = "dg_phase_shield_last_sync";
     private static final String TAG_LAST_SECONDS = "dg_phase_shield_last_seconds";
+    private static final String TAG_LAST_HEARTBEAT_SYNC = "dg_phase_shield_last_heartbeat_sync";
+    private static final String TAG_HEALTH_LOCK = "dg_phase_shield_health_lock";
+    private static final String TAG_MAX_HEALTH_LOCK = "dg_phase_shield_max_health_lock";
+
+    private static final ResourceLocation PHASE_MAX_HEALTH_GUARD_ID =
+            ResourceLocation.fromNamespaceAndPath("dgmodules", "phase_shield_max_health_guard");
 
     /**
      * Server-side helper for syncing phase remaining seconds to clients.
@@ -35,9 +46,9 @@ public class PhaseShieldLogic {
         return sp.getPersistentData().getInt(TAG_LAST_SECONDS);
     }
 
-    /** ✅ 可配置：每 tick 消耗 OP */
+    /** Configurable OP cost per tick. */
     public static long getOpCostPerTick() {
-        // 允许你配置到巨额
+        // Allow very large values from config.
         return Math.max(0L, DGConfig.Server.phaseShieldCostPerTick.get());
     }
 
@@ -45,7 +56,35 @@ public class PhaseShieldLogic {
         return sp != null && sp.getPersistentData().getBoolean(TAG_ACTIVE);
     }
 
-    /** ✅ 供事件类调用：护盾受击音效（跟随玩家播一次，不循环） */
+    /**
+     * Shared lethal-path guard for mixins that intercept death/remove operations.
+     */
+    public static boolean tryInterceptLethalOperation(ServerPlayer sp) {
+        if (sp == null || sp.level().isClientSide) return false;
+
+        boolean active = isActive(sp);
+        boolean emergency = active || tryActivateEmergency(sp);
+        DGModules.LOGGER.info(
+                "[PhaseShield] lethal intercept attempt player={} active={} emergency={} hp={} deadOrDying={} deathTime={}",
+                sp.getGameProfile().getName(),
+                active,
+                emergency,
+                sp.getHealth(),
+                sp.isDeadOrDying(),
+                sp.deathTime
+        );
+        if (!emergency) {
+            debugEmergencyFail(sp, "tryInterceptLethalOperation");
+            return false;
+        }
+
+        playShieldHit(sp);
+        stabilizeAfterDeathIntercept(sp);
+        DGModules.LOGGER.info("[PhaseShield] lethal intercept success player={}", sp.getGameProfile().getName());
+        return true;
+    }
+
+    /** Play a one-shot shield-hit sound on server side. */
     public static void playShieldHit(ServerPlayer target) {
         target.level().playSound(
                 null,
@@ -57,7 +96,7 @@ public class PhaseShieldLogic {
         );
     }
 
-    /** 手动切换（按键） */
+    /** Manual toggle from key input. */
     public static void toggle(ServerPlayer sp) {
         if (sp == null || sp.isSpectator()) return;
 
@@ -74,21 +113,37 @@ public class PhaseShieldLogic {
         setActive(sp, true, seconds, true);
     }
 
-    /** ✅ 应急开启：用于“致死前自动开启” */
+    /** Emergency activation used before lethal damage is finalized. */
     public static boolean tryActivateEmergency(ServerPlayer sp) {
         if (sp == null || sp.isSpectator()) return false;
         if (isActive(sp)) return true;
-        if (!canActivate(sp)) return false;
+        if (!canActivate(sp)) {
+            debugEmergencyFail(sp, "tryActivateEmergency");
+            return false;
+        }
 
         ItemStack chest = findChaoticChestFromArmorOrCurios(sp);
         int seconds = (int) Math.min(Integer.MAX_VALUE, estimateSecondsRemaining(sp, chest));
-        if (seconds <= 0) return false;
+        if (seconds <= 0) {
+            DGModules.LOGGER.info(
+                    "[PhaseShield] emergency denied player={} reason=seconds<=0 totalOp={} costPerTick={}",
+                    sp.getGameProfile().getName(),
+                    getTotalOpAvailable(sp, chest),
+                    getOpCostPerTick()
+            );
+            return false;
+        }
 
         setActive(sp, true, seconds, true);
+        DGModules.LOGGER.info(
+                "[PhaseShield] emergency activated player={} seconds={}",
+                sp.getGameProfile().getName(),
+                seconds
+        );
         return true;
     }
 
-    /** ✅ 是否满足开启前提（混沌护胸 + 相位护盾模块 + 护盾控制强化模块 + 至少能维持 1 tick） */
+    /** Check activation prerequisites. */
     public static boolean canActivate(ServerPlayer sp) {
         if (sp == null || sp.isSpectator()) return false;
 
@@ -108,10 +163,16 @@ public class PhaseShieldLogic {
         }
     }
 
-    /** 每 tick 维持 */
+    /** Per-tick maintenance while active. */
     public static void tick(ServerPlayer sp) {
         if (sp == null || sp.isSpectator()) return;
-        if (!sp.getPersistentData().getBoolean(TAG_ACTIVE)) return;
+        boolean active = sp.getPersistentData().getBoolean(TAG_ACTIVE);
+        if (!active) {
+            syncHeartbeatIfNeeded(sp, false, 0);
+            return;
+        }
+
+        applyHealthAndMaxHealthGuard(sp);
 
         ItemStack chest = findChaoticChestFromArmorOrCurios(sp);
         if (chest.isEmpty()) {
@@ -141,7 +202,7 @@ public class PhaseShieldLogic {
                 int seconds = (int) Math.min(Integer.MAX_VALUE, estimateSecondsRemaining(sp, chest));
                 sp.getPersistentData().putInt(TAG_LAST_SECONDS, seconds);
                 sp.getPersistentData().putLong(TAG_LAST_SYNC, now);
-                NetworkHandler.sendToPlayer(sp, new S2CPhaseShieldState(true, seconds));
+                sendPhaseState(sp, true, seconds);
             }
         } catch (Throwable t) {
             DGModules.LOGGER.warn("PhaseShield tick failed", t);
@@ -149,17 +210,133 @@ public class PhaseShieldLogic {
         }
     }
 
-    /** playStartSound=true 时：通知客户端开启“持续跟随”循环音效（客户端自己保证只有一个实例） */
+    /** Sync phase state to client. */
     private static void setActive(ServerPlayer sp, boolean active, int seconds, boolean playStartSound) {
         sp.getPersistentData().putBoolean(TAG_ACTIVE, active);
         sp.getPersistentData().putInt(TAG_LAST_SECONDS, Math.max(0, seconds));
         sp.getPersistentData().putLong(TAG_LAST_SYNC, sp.serverLevel().getGameTime());
+        if (active) {
+            initHealthAndMaxHealthGuard(sp);
+        } else {
+            clearHealthAndMaxHealthGuard(sp);
+        }
 
-        // ✅ 客户端会在收到包时开始/停止循环音效
+        sendPhaseState(sp, active, Math.max(0, seconds));
+        syncHealthPacket(sp);
+
+        // Fixed-position loop sound is not played on server side here.
+        // Following loop sound is fully handled by client.
+    }
+
+
+    /**
+     * Keep player state coherent after a lethal path is intercepted.
+     * This prevents client/server ghost states caused by "death started but canceled".
+     */
+    public static void stabilizeAfterDeathIntercept(ServerPlayer sp) {
+        if (sp == null || sp.level().isClientSide) return;
+
+        applyHealthAndMaxHealthGuard(sp);
+        if (sp.getHealth() <= 0.0F) {
+            float restore = getLockedHealth(sp);
+            if (restore <= 0.0F) restore = 1.0F;
+            sp.setHealth(Math.min(sp.getMaxHealth(), restore));
+        }
+        sp.deathTime = 0;
+        sp.fallDistance = 0.0F;
+        sp.invulnerableTime = Math.max(sp.invulnerableTime, 2);
+        sp.hurtMarked = true;
+
+        boolean active = isActive(sp);
+        int seconds = active ? Math.max(0, getLastSeconds(sp)) : 0;
+        sendPhaseState(sp, active, seconds);
+        syncHealthPacket(sp);
+    }
+
+    private static void syncHeartbeatIfNeeded(ServerPlayer sp, boolean active, int seconds) {
+        long now = sp.serverLevel().getGameTime();
+        long last = sp.getPersistentData().getLong(TAG_LAST_HEARTBEAT_SYNC);
+        if (now - last < 20) return;
+        sp.getPersistentData().putLong(TAG_LAST_HEARTBEAT_SYNC, now);
+        sendPhaseState(sp, active, seconds);
+        syncHealthPacket(sp);
+    }
+
+    private static void sendPhaseState(ServerPlayer sp, boolean active, int seconds) {
+        if (sp.connection == null) {
+            DGModules.LOGGER.info(
+                    "[PhaseShield] skip sendPhaseState player={} reason=no_connection active={} seconds={}",
+                    sp.getGameProfile().getName(),
+                    active,
+                    Math.max(0, seconds)
+            );
+            return;
+        }
         NetworkHandler.sendToPlayer(sp, new S2CPhaseShieldState(active, Math.max(0, seconds)));
+    }
 
-        // 这里不再 server 端播放“固定在原地”的声音
-        // 循环跟随音效完全交给客户端（见 ClientPhaseShieldSound）
+    private static void syncHealthPacket(ServerPlayer sp) {
+        if (sp.connection == null) return;
+        sp.connection.send(new ClientboundSetHealthPacket(
+                sp.getHealth(),
+                sp.getFoodData().getFoodLevel(),
+                sp.getFoodData().getSaturationLevel()
+        ));
+    }
+
+    private static void initHealthAndMaxHealthGuard(ServerPlayer sp) {
+        var data = sp.getPersistentData();
+        data.putFloat(TAG_HEALTH_LOCK, Math.max(1.0F, sp.getHealth()));
+        data.putFloat(TAG_MAX_HEALTH_LOCK, Math.max(1.0F, sp.getMaxHealth()));
+        applyHealthAndMaxHealthGuard(sp);
+    }
+
+    private static float getLockedHealth(ServerPlayer sp) {
+        var data = sp.getPersistentData();
+        if (!data.contains(TAG_HEALTH_LOCK)) return Math.max(1.0F, sp.getHealth());
+        return Math.max(1.0F, data.getFloat(TAG_HEALTH_LOCK));
+    }
+
+    private static void applyHealthAndMaxHealthGuard(ServerPlayer sp) {
+        var data = sp.getPersistentData();
+
+        float lockMax = data.contains(TAG_MAX_HEALTH_LOCK) ? data.getFloat(TAG_MAX_HEALTH_LOCK) : Math.max(1.0F, sp.getMaxHealth());
+        lockMax = Math.max(1.0F, lockMax);
+        data.putFloat(TAG_MAX_HEALTH_LOCK, lockMax);
+
+        AttributeInstance maxHealthAttr = sp.getAttribute(Attributes.MAX_HEALTH);
+        if (maxHealthAttr != null) {
+            maxHealthAttr.removeModifier(PHASE_MAX_HEALTH_GUARD_ID);
+            double need = (double) lockMax - maxHealthAttr.getValue();
+            if (need > 0.0001D) {
+                maxHealthAttr.addTransientModifier(new AttributeModifier(
+                        PHASE_MAX_HEALTH_GUARD_ID,
+                        need,
+                        AttributeModifier.Operation.ADD_VALUE
+                ));
+            }
+        }
+
+        float lockHealth = data.contains(TAG_HEALTH_LOCK) ? data.getFloat(TAG_HEALTH_LOCK) : Math.max(1.0F, sp.getHealth());
+        lockHealth = Math.max(1.0F, lockHealth);
+        float currentHealth = sp.getHealth();
+        if (currentHealth < lockHealth) {
+            sp.setHealth(Math.min(sp.getMaxHealth(), lockHealth));
+            currentHealth = sp.getHealth();
+        } else if (currentHealth > lockHealth) {
+            lockHealth = currentHealth;
+        }
+        data.putFloat(TAG_HEALTH_LOCK, lockHealth);
+    }
+
+    private static void clearHealthAndMaxHealthGuard(ServerPlayer sp) {
+        var data = sp.getPersistentData();
+        data.remove(TAG_HEALTH_LOCK);
+        data.remove(TAG_MAX_HEALTH_LOCK);
+        AttributeInstance maxHealthAttr = sp.getAttribute(Attributes.MAX_HEALTH);
+        if (maxHealthAttr != null) {
+            maxHealthAttr.removeModifier(PHASE_MAX_HEALTH_GUARD_ID);
+        }
     }
 
     private static boolean hostHasShieldControlBooster(ModuleHost host) {
@@ -167,6 +344,53 @@ public class PhaseShieldLogic {
             if (ent instanceof ShieldControlBoosterModuleEntity) return true;
         }
         return false;
+    }
+
+    private static void debugEmergencyFail(ServerPlayer sp, String stage) {
+        if (sp == null) return;
+        ItemStack chest = findChaoticChestFromArmorOrCurios(sp);
+        if (chest.isEmpty()) {
+            DGModules.LOGGER.info("[PhaseShield] {} denied player={} reason=no_chaotic_chest", stage, sp.getGameProfile().getName());
+            return;
+        }
+
+        try (ModuleHost host = DECapabilities.getHost(chest)) {
+            if (host == null) {
+                DGModules.LOGGER.info("[PhaseShield] {} denied player={} reason=no_module_host", stage, sp.getGameProfile().getName());
+                return;
+            }
+            if (!PhaseShieldModuleEntity.hostHasPhaseShield(host)) {
+                DGModules.LOGGER.info("[PhaseShield] {} denied player={} reason=no_phase_module", stage, sp.getGameProfile().getName());
+                return;
+            }
+            if (!hostHasShieldControlBooster(host)) {
+                DGModules.LOGGER.info("[PhaseShield] {} denied player={} reason=no_booster_module", stage, sp.getGameProfile().getName());
+                return;
+            }
+
+            long total = getTotalOpAvailable(sp, chest);
+            long cost = getOpCostPerTick();
+            if (total < cost) {
+                DGModules.LOGGER.info(
+                        "[PhaseShield] {} denied player={} reason=insufficient_op totalOp={} costPerTick={}",
+                        stage,
+                        sp.getGameProfile().getName(),
+                        total,
+                        cost
+                );
+                return;
+            }
+
+            DGModules.LOGGER.info(
+                    "[PhaseShield] {} denied player={} reason=unknown totalOp={} costPerTick={}",
+                    stage,
+                    sp.getGameProfile().getName(),
+                    total,
+                    cost
+            );
+        } catch (Throwable t) {
+            DGModules.LOGGER.info("[PhaseShield] {} denied player={} reason=exception {}", stage, sp.getGameProfile().getName(), t.toString());
+        }
     }
 
     private static long estimateSecondsRemaining(ServerPlayer sp, ItemStack chest) {
@@ -302,3 +526,5 @@ public class PhaseShieldLogic {
                 .orElse(ItemStack.EMPTY);
     }
 }
+
+
