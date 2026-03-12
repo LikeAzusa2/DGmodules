@@ -13,6 +13,18 @@
     {
       "consume": true,
       "ingredient": {
+        "item": "draconicevolution:chaotic_energy_core"
+      }
+    },
+    {
+      "consume": true,
+      "ingredient": {
+        "item": "draconicevolution:chaotic_energy_core"
+      }
+    },
+    {
+      "consume": true,
+      "ingredient": {
         "item": "draconicevolution:item_chaotic_shield_recovery"
       }
     },
@@ -25,31 +37,25 @@
     {
       "consume": true,
       "ingredient": {
-        "item": "draconicevolution:chaotic_core"
+        "item": "draconicevolution:medium_chaos_frag"
       }
     },
     {
       "consume": true,
       "ingredient": {
-        "item": "draconicevolution:chaos_shard"
+        "item": "draconicevolution:medium_chaos_frag"
       }
     },
     {
       "consume": true,
       "ingredient": {
-        "item": "draconicevolution:chaos_shard"
+        "item": "draconicevolution:medium_chaos_frag"
       }
     },
     {
       "consume": true,
       "ingredient": {
-        "item": "draconicevolution:large_chaos_frag"
-      }
-    },
-    {
-      "consume": true,
-      "ingredient": {
-        "item": "draconicevolution:large_chaos_frag"
+        "item": "draconicevolution:medium_chaos_frag"
       }
     }
   ],

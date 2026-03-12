@@ -37,19 +37,13 @@
     {
       "consume": true,
       "ingredient": {
-        "item": "draconicevolution:chaotic_core"
+        "item": "draconicevolution:medium_chaos_frag"
       }
     },
     {
       "consume": true,
       "ingredient": {
-        "item": "draconicevolution:large_chaos_frag"
-      }
-    },
-    {
-      "consume": true,
-      "ingredient": {
-        "item": "draconicevolution:large_chaos_frag"
+        "item": "draconicevolution:medium_chaos_frag"
       }
     }
   ],
