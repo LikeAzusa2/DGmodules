@@ -130,7 +130,7 @@ public class ChaosLaserLogic {
 
             syncToClient(sp, true, Phase.CHARGING, 0L);
 
-            DGModules.LOGGER.info("ChaosLaser start (CHARGING) player={}", sp.getGameProfile().getName());
+            DGModules.LOGGER.debug("ChaosLaser start (CHARGING) player={}", sp.getGameProfile().getName());
             return;
         }
 
@@ -174,7 +174,7 @@ public class ChaosLaserLogic {
                 if (elapsed >= CHARGE_TICKS) {
                     st.phase = Phase.NORMAL;
                     st.phaseStartTick = now;
-                    DGModules.LOGGER.info("ChaosLaser -> NORMAL player={}", sp.getGameProfile().getName());
+                    DGModules.LOGGER.debug("ChaosLaser -> NORMAL player={}", sp.getGameProfile().getName());
                     syncToClient(sp, true, Phase.NORMAL, 0L);
 
                     playSound(sp.serverLevel(), sp, DESounds.BEAM.get(), SoundSource.PLAYERS, 0.9f, 1.0f);
@@ -194,7 +194,7 @@ public class ChaosLaserLogic {
                 if (elapsed >= NORMAL_TICKS) {
                     st.phase = Phase.EXECUTE;
                     st.phaseStartTick = now;
-                    DGModules.LOGGER.info("ChaosLaser -> EXECUTE player={}", sp.getGameProfile().getName());
+                    DGModules.LOGGER.debug("ChaosLaser -> EXECUTE player={}", sp.getGameProfile().getName());
                     syncToClient(sp, true, Phase.EXECUTE, 0L);
 
                     playSound(sp.serverLevel(), sp, DESounds.CRYSTAL_BEAM.get(), SoundSource.HOSTILE, 0.90f, 1.40f);
@@ -260,7 +260,7 @@ public class ChaosLaserLogic {
         syncToClient(sp, false, null, cdUntil);
 
         if (existed) {
-            DGModules.LOGGER.info("ChaosLaser stop ({}) player={}", reason, sp.getGameProfile().getName());
+            DGModules.LOGGER.debug("ChaosLaser stop ({}) player={}", reason, sp.getGameProfile().getName());
         }
     }
 

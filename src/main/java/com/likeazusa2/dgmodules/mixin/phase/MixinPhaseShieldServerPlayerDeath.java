@@ -26,7 +26,7 @@ public abstract class MixinPhaseShieldServerPlayerDeath {
     private void dg$die(DamageSource source, CallbackInfo ci) {
         ServerPlayer sp = (ServerPlayer) (Object) this;
         if (sp.level().isClientSide) return;
-        DGModules.LOGGER.info(
+        DGModules.LOGGER.debug(
                 "[PhaseShield] MixinPhaseShieldServerPlayerDeath#die player={} hp={} deathTime={} active={} source={}",
                 sp.getGameProfile().getName(),
                 sp.getHealth(),
@@ -36,7 +36,7 @@ public abstract class MixinPhaseShieldServerPlayerDeath {
         );
 
         if (dg$tryInterceptDeathPath(sp)) {
-            DGModules.LOGGER.info("[PhaseShield] MixinPhaseShieldServerPlayerDeath#die canceled player={}", sp.getGameProfile().getName());
+            DGModules.LOGGER.debug("[PhaseShield] MixinPhaseShieldServerPlayerDeath#die canceled player={}", sp.getGameProfile().getName());
             ci.cancel();
         }
     }
@@ -45,7 +45,7 @@ public abstract class MixinPhaseShieldServerPlayerDeath {
     private void dg$kill(CallbackInfo ci) {
         ServerPlayer sp = (ServerPlayer) (Object) this;
         if (sp.level().isClientSide) return;
-        DGModules.LOGGER.info(
+        DGModules.LOGGER.debug(
                 "[PhaseShield] MixinPhaseShieldServerPlayerDeath#kill player={} hp={} deathTime={} active={}",
                 sp.getGameProfile().getName(),
                 sp.getHealth(),
@@ -54,7 +54,7 @@ public abstract class MixinPhaseShieldServerPlayerDeath {
         );
 
         if (dg$tryInterceptDeathPath(sp)) {
-            DGModules.LOGGER.info("[PhaseShield] MixinPhaseShieldServerPlayerDeath#kill canceled player={}", sp.getGameProfile().getName());
+            DGModules.LOGGER.debug("[PhaseShield] MixinPhaseShieldServerPlayerDeath#kill canceled player={}", sp.getGameProfile().getName());
             ci.cancel();
         }
     }
@@ -63,7 +63,7 @@ public abstract class MixinPhaseShieldServerPlayerDeath {
     private void dg$discard(CallbackInfo ci) {
         ServerPlayer sp = (ServerPlayer) (Object) this;
         if (sp.level().isClientSide) return;
-        DGModules.LOGGER.info(
+        DGModules.LOGGER.debug(
                 "[PhaseShield] MixinPhaseShieldServerPlayerDeath#discard player={} hp={} deathTime={} deadOrDying={} active={}",
                 sp.getGameProfile().getName(),
                 sp.getHealth(),
@@ -75,7 +75,7 @@ public abstract class MixinPhaseShieldServerPlayerDeath {
         if (!(sp.isDeadOrDying() || sp.getHealth() <= 0.0F || sp.deathTime > 0)) return;
 
         if (dg$tryInterceptDeathPath(sp)) {
-            DGModules.LOGGER.info("[PhaseShield] MixinPhaseShieldServerPlayerDeath#discard canceled player={}", sp.getGameProfile().getName());
+            DGModules.LOGGER.debug("[PhaseShield] MixinPhaseShieldServerPlayerDeath#discard canceled player={}", sp.getGameProfile().getName());
             ci.cancel();
         }
     }
@@ -84,7 +84,7 @@ public abstract class MixinPhaseShieldServerPlayerDeath {
     private void dg$remove(Entity.RemovalReason reason, CallbackInfo ci) {
         ServerPlayer sp = (ServerPlayer) (Object) this;
         if (sp.level().isClientSide) return;
-        DGModules.LOGGER.info(
+        DGModules.LOGGER.debug(
                 "[PhaseShield] MixinPhaseShieldServerPlayerDeath#remove player={} reason={} hp={} deathTime={} deadOrDying={} active={}",
                 sp.getGameProfile().getName(),
                 reason,
@@ -97,7 +97,7 @@ public abstract class MixinPhaseShieldServerPlayerDeath {
         if (!(sp.isDeadOrDying() || sp.getHealth() <= 0.0F || sp.deathTime > 0)) return;
 
         if (dg$tryInterceptDeathPath(sp)) {
-            DGModules.LOGGER.info("[PhaseShield] MixinPhaseShieldServerPlayerDeath#remove canceled player={}", sp.getGameProfile().getName());
+            DGModules.LOGGER.debug("[PhaseShield] MixinPhaseShieldServerPlayerDeath#remove canceled player={}", sp.getGameProfile().getName());
             ci.cancel();
         }
     }
@@ -106,7 +106,7 @@ public abstract class MixinPhaseShieldServerPlayerDeath {
     private void dg$removeWithFlag(Entity.RemovalReason reason, boolean keepData, CallbackInfo ci) {
         ServerPlayer sp = (ServerPlayer) (Object) this;
         if (sp.level().isClientSide) return;
-        DGModules.LOGGER.info(
+        DGModules.LOGGER.debug(
                 "[PhaseShield] MixinPhaseShieldServerPlayerDeath#remove2 player={} reason={} keepData={} hp={} deathTime={} deadOrDying={} active={}",
                 sp.getGameProfile().getName(),
                 reason,
@@ -120,7 +120,7 @@ public abstract class MixinPhaseShieldServerPlayerDeath {
         if (!(sp.isDeadOrDying() || sp.getHealth() <= 0.0F || sp.deathTime > 0)) return;
 
         if (dg$tryInterceptDeathPath(sp)) {
-            DGModules.LOGGER.info("[PhaseShield] MixinPhaseShieldServerPlayerDeath#remove2 canceled player={}", sp.getGameProfile().getName());
+            DGModules.LOGGER.debug("[PhaseShield] MixinPhaseShieldServerPlayerDeath#remove2 canceled player={}", sp.getGameProfile().getName());
             ci.cancel();
         }
     }
@@ -129,7 +129,7 @@ public abstract class MixinPhaseShieldServerPlayerDeath {
     private void dg$setRemoved(Entity.RemovalReason reason, CallbackInfo ci) {
         ServerPlayer sp = (ServerPlayer) (Object) this;
         if (sp.level().isClientSide) return;
-        DGModules.LOGGER.info(
+        DGModules.LOGGER.debug(
                 "[PhaseShield] MixinPhaseShieldServerPlayerDeath#setRemoved player={} reason={} hp={} deathTime={} deadOrDying={} active={}",
                 sp.getGameProfile().getName(),
                 reason,
@@ -142,7 +142,7 @@ public abstract class MixinPhaseShieldServerPlayerDeath {
         if (!(sp.isDeadOrDying() || sp.getHealth() <= 0.0F || sp.deathTime > 0)) return;
 
         if (dg$tryInterceptDeathPath(sp)) {
-            DGModules.LOGGER.info("[PhaseShield] MixinPhaseShieldServerPlayerDeath#setRemoved canceled player={}", sp.getGameProfile().getName());
+            DGModules.LOGGER.debug("[PhaseShield] MixinPhaseShieldServerPlayerDeath#setRemoved canceled player={}", sp.getGameProfile().getName());
             ci.cancel();
         }
     }

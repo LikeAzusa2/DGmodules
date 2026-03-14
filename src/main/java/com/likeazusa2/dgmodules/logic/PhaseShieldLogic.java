@@ -19,6 +19,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -62,7 +63,7 @@ public class PhaseShieldLogic {
 
         boolean active = isActive(sp);
         boolean emergency = active || tryActivateEmergency(sp);
-        DGModules.LOGGER.info(
+        DGModules.LOGGER.debug(
                 "[PhaseShield] lethal intercept attempt player={} active={} emergency={} hp={} deadOrDying={} deathTime={}",
                 sp.getGameProfile().getName(),
                 active,
@@ -78,12 +79,17 @@ public class PhaseShieldLogic {
 
         playShieldHit(sp);
         stabilizeAfterDeathIntercept(sp);
-        DGModules.LOGGER.info("[PhaseShield] lethal intercept success player={}", sp.getGameProfile().getName());
+        DGModules.LOGGER.debug("[PhaseShield] lethal intercept success player={}", sp.getGameProfile().getName());
         return true;
     }
 
     /** Play a one-shot shield-hit sound on server side. */
     public static void playShieldHit(ServerPlayer target) {
+        playShieldHit((LivingEntity) target);
+    }
+
+    /** Play a one-shot shield-hit sound for any living entity. */
+    public static void playShieldHit(LivingEntity target) {
         target.level().playSound(
                 null,
                 target.blockPosition(),
@@ -123,7 +129,7 @@ public class PhaseShieldLogic {
         ItemStack chest = findPhaseShieldHost(sp);
         int seconds = (int) Math.min(Integer.MAX_VALUE, estimateSecondsRemaining(sp, chest));
         if (seconds <= 0) {
-            DGModules.LOGGER.info(
+            DGModules.LOGGER.debug(
                     "[PhaseShield] emergency denied player={} reason=seconds<=0 totalOp={} costPerTick={}",
                     sp.getGameProfile().getName(),
                     getTotalOpAvailable(sp, chest),
@@ -133,7 +139,7 @@ public class PhaseShieldLogic {
         }
 
         setActive(sp, true, seconds, true);
-        DGModules.LOGGER.info(
+        DGModules.LOGGER.debug(
                 "[PhaseShield] emergency activated player={} seconds={}",
                 sp.getGameProfile().getName(),
                 seconds
@@ -262,7 +268,7 @@ public class PhaseShieldLogic {
 
     private static void sendPhaseState(ServerPlayer sp, boolean active, int seconds) {
         if (sp.connection == null) {
-            DGModules.LOGGER.info(
+            DGModules.LOGGER.debug(
                     "[PhaseShield] skip sendPhaseState player={} reason=no_connection active={} seconds={}",
                     sp.getGameProfile().getName(),
                     active,
@@ -348,28 +354,28 @@ public class PhaseShieldLogic {
         if (sp == null) return;
         ItemStack chest = findPhaseShieldHost(sp);
         if (chest.isEmpty()) {
-            DGModules.LOGGER.info("[PhaseShield] {} denied player={} reason=no_chaotic_chest", stage, sp.getGameProfile().getName());
+            DGModules.LOGGER.debug("[PhaseShield] {} denied player={} reason=no_chaotic_chest", stage, sp.getGameProfile().getName());
             return;
         }
 
         try (ModuleHost host = DECapabilities.getHost(chest)) {
             if (host == null) {
-                DGModules.LOGGER.info("[PhaseShield] {} denied player={} reason=no_module_host", stage, sp.getGameProfile().getName());
+                DGModules.LOGGER.debug("[PhaseShield] {} denied player={} reason=no_module_host", stage, sp.getGameProfile().getName());
                 return;
             }
             if (!PhaseShieldModuleEntity.hostHasPhaseShield(host)) {
-                DGModules.LOGGER.info("[PhaseShield] {} denied player={} reason=no_phase_module", stage, sp.getGameProfile().getName());
+                DGModules.LOGGER.debug("[PhaseShield] {} denied player={} reason=no_phase_module", stage, sp.getGameProfile().getName());
                 return;
             }
             if (!hostHasShieldControlBooster(host)) {
-                DGModules.LOGGER.info("[PhaseShield] {} denied player={} reason=no_booster_module", stage, sp.getGameProfile().getName());
+                DGModules.LOGGER.debug("[PhaseShield] {} denied player={} reason=no_booster_module", stage, sp.getGameProfile().getName());
                 return;
             }
 
             long total = getTotalOpAvailable(sp, chest);
             long cost = getOpCostPerTick();
             if (total < cost) {
-                DGModules.LOGGER.info(
+                DGModules.LOGGER.debug(
                         "[PhaseShield] {} denied player={} reason=insufficient_op totalOp={} costPerTick={}",
                         stage,
                         sp.getGameProfile().getName(),
@@ -379,7 +385,7 @@ public class PhaseShieldLogic {
                 return;
             }
 
-            DGModules.LOGGER.info(
+            DGModules.LOGGER.debug(
                     "[PhaseShield] {} denied player={} reason=unknown totalOp={} costPerTick={}",
                     stage,
                     sp.getGameProfile().getName(),
@@ -387,7 +393,7 @@ public class PhaseShieldLogic {
                     cost
             );
         } catch (Throwable t) {
-            DGModules.LOGGER.info("[PhaseShield] {} denied player={} reason=exception {}", stage, sp.getGameProfile().getName(), t.toString());
+            DGModules.LOGGER.debug("[PhaseShield] {} denied player={} reason=exception {}", stage, sp.getGameProfile().getName(), t.toString());
         }
     }
 

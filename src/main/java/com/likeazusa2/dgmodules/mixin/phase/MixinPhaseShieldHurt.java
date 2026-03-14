@@ -40,7 +40,7 @@ public abstract class MixinPhaseShieldHurt {
 
         boolean active = PhaseShieldLogic.isActive(sp);
         boolean lethal = newHealth <= 0.0F;
-        DGModules.LOGGER.info(
+        DGModules.LOGGER.debug(
                 "[PhaseShield] MixinPhaseShieldHurt#setHealth player={} cur={} new={} lethal={} active={}",
                 sp.getGameProfile().getName(),
                 cur,
@@ -54,7 +54,7 @@ public abstract class MixinPhaseShieldHurt {
             if (lethal || active) {
                 PhaseShieldLogic.stabilizeAfterDeathIntercept(sp);
             }
-            DGModules.LOGGER.info(
+            DGModules.LOGGER.debug(
                     "[PhaseShield] MixinPhaseShieldHurt#setHealth canceled player={} lethal={} active={}",
                     sp.getGameProfile().getName(),
                     lethal,
@@ -70,7 +70,7 @@ public abstract class MixinPhaseShieldHurt {
         if (self.level().isClientSide) return;
         if (!(self instanceof ServerPlayer sp)) return;
 
-        DGModules.LOGGER.info(
+        DGModules.LOGGER.debug(
                 "[PhaseShield] MixinPhaseShieldHurt#tickDeath player={} hp={} deathTime={} active={}",
                 sp.getGameProfile().getName(),
                 sp.getHealth(),
@@ -78,7 +78,7 @@ public abstract class MixinPhaseShieldHurt {
                 PhaseShieldLogic.isActive(sp)
         );
         if (PhaseShieldLogic.tryInterceptLethalOperation(sp)) {
-            DGModules.LOGGER.info("[PhaseShield] MixinPhaseShieldHurt#tickDeath canceled player={}", sp.getGameProfile().getName());
+            DGModules.LOGGER.debug("[PhaseShield] MixinPhaseShieldHurt#tickDeath canceled player={}", sp.getGameProfile().getName());
             ci.cancel();
         }
     }

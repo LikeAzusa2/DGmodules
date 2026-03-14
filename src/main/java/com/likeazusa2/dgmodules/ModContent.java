@@ -200,6 +200,50 @@ public class ModContent {
     private static Module<?> getChaoticHpDamageModule() {
         return CHAOTIC_HP_DAMAGE_MODULE.get();
     }
+
+    // ===== Energy Saver Modules（宿主整体节能）=====
+
+    public static final DeferredHolder<Item, EnergySaverModuleItem> WYVERN_ENERGY_SAVER_MODULE_ITEM =
+            ITEMS.register("wyvern_energy_saver_module",
+                    () -> new EnergySaverModuleItem(new Item.Properties(), ModContent::getWyvernEnergySaverModule)
+            );
+
+    public static final DeferredHolder<Module<?>, EnergySaverModule> WYVERN_ENERGY_SAVER_MODULE =
+            DG_MODULES.register("wyvern_energy_saver",
+                    () -> new EnergySaverModule(WYVERN_ENERGY_SAVER_MODULE_ITEM.get(), TechLevel.DRACONIUM, 0.03f)
+            );
+
+    private static Module<?> getWyvernEnergySaverModule() {
+        return WYVERN_ENERGY_SAVER_MODULE.get();
+    }
+
+    public static final DeferredHolder<Item, EnergySaverModuleItem> DRACONIC_ENERGY_SAVER_MODULE_ITEM =
+            ITEMS.register("draconic_energy_saver_module",
+                    () -> new EnergySaverModuleItem(new Item.Properties(), ModContent::getDraconicEnergySaverModule)
+            );
+
+    public static final DeferredHolder<Module<?>, EnergySaverModule> DRACONIC_ENERGY_SAVER_MODULE =
+            DG_MODULES.register("draconic_energy_saver",
+                    () -> new EnergySaverModule(DRACONIC_ENERGY_SAVER_MODULE_ITEM.get(), TechLevel.DRACONIC, 0.06f)
+            );
+
+    private static Module<?> getDraconicEnergySaverModule() {
+        return DRACONIC_ENERGY_SAVER_MODULE.get();
+    }
+
+    public static final DeferredHolder<Item, EnergySaverModuleItem> CHAOTIC_ENERGY_SAVER_MODULE_ITEM =
+            ITEMS.register("chaotic_energy_saver_module",
+                    () -> new EnergySaverModuleItem(new Item.Properties(), ModContent::getChaoticEnergySaverModule)
+            );
+
+    public static final DeferredHolder<Module<?>, EnergySaverModule> CHAOTIC_ENERGY_SAVER_MODULE =
+            DG_MODULES.register("chaotic_energy_saver",
+                    () -> new EnergySaverModule(CHAOTIC_ENERGY_SAVER_MODULE_ITEM.get(), TechLevel.CHAOTIC, 0.10f)
+            );
+
+    private static Module<?> getChaoticEnergySaverModule() {
+        return CHAOTIC_ENERGY_SAVER_MODULE.get();
+    }
     // ===== Flight Tuner =====
 
     public static final DeferredHolder<Item, FlightTunerModuleItem> FLIGHT_TUNER_MODULE_ITEM =
@@ -368,6 +412,9 @@ public static final DeferredHolder<CreativeModeTab, CreativeModeTab> DG_MODULES_
                                 output.accept(WYVERN_HP_DAMAGE_MODULE_ITEM.get());
                                 output.accept(DRACONIC_HP_DAMAGE_MODULE_ITEM.get());
                                 output.accept(CHAOTIC_HP_DAMAGE_MODULE_ITEM.get());
+                                output.accept(WYVERN_ENERGY_SAVER_MODULE_ITEM.get());
+                                output.accept(DRACONIC_ENERGY_SAVER_MODULE_ITEM.get());
+                                output.accept(CHAOTIC_ENERGY_SAVER_MODULE_ITEM.get());
                                 output.accept(NEGATIVE_EFFECT_IMMUNITY_MODULE_ITEM.get());
                                 output.accept(SHIELD_CONTROL_BOOSTER_MODULE_ITEM.get());
                                 output.accept(COMPRESSED_CHAOTIC_ENERGY_MODULE_ITEM.get());

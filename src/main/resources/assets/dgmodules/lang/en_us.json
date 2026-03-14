@@ -20,6 +20,14 @@
   "tooltip.dgmodules.hp_damage.energy": "Consumes 2000 OP per 1 extra damage",
   "tooltip.dgmodules.hp_cut.total": "Life Reduction Total: %s%% (based on target current health)",
 
+  "item.dgmodules.wyvern_energy_saver_module": "Wyvern Energy Saver Module",
+  "item.dgmodules.draconic_energy_saver_module": "Draconic Energy Saver Module",
+  "item.dgmodules.chaotic_energy_saver_module": "Chaotic Energy Saver Module",
+  "module_type.draconicevolution.energy_saver.name": "Energy Saver",
+  "module.dgmodules.energy_saver.desc": "Reduces the OP cost of the entire host. Multiple modules stack additively before being applied to all host energy usage.",
+  "tooltip.dgmodules.energy_saver.rate": "This module reduces host OP usage by %s%%",
+  "tooltip.dgmodules.energy_saver.stack": "Applies to armor, tools, melee weapons, and bows installed as valid hosts.",
+
   "item.dgmodules.flight_tuner_module": "Flight tuner Module",
   "module_type.draconicevolution.flight_tuner.name": "Flight tuner",
   "item_prop.draconicevolution.speed_mul": "Total Flight Speed",

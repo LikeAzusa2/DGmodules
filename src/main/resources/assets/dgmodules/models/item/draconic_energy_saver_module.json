@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "dgmodules:item/draconic_energy_saver_module"
+  }
+}

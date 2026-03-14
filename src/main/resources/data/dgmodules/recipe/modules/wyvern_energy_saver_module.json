@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "IPI",
+    "CMC",
+    "IWI"
+  ],
+  "key": {
+    "I": {
+      "tag": "c:ingots/draconium"
+    },
+    "P": {
+      "item": "draconicevolution:wyvern_energy_core"
+    },
+    "C": {
+      "item": "draconicevolution:draconium_core"
+    },
+    "M": {
+      "item": "draconicevolution:module_core"
+    },
+    "W": {
+      "item": "minecraft:redstone_block"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "dgmodules:wyvern_energy_saver_module"
+  }
+}

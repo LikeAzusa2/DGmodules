@@ -77,4 +77,12 @@
 
   "item.dgmodules.draconic_shield_dome_emitter": "龙核护盾穹顶发射器",
   "block.dgmodules.dont_ignite": "不要点燃"
+  ,
+  "item.dgmodules.wyvern_energy_saver_module": "飞龙节能模块",
+  "item.dgmodules.draconic_energy_saver_module": "神龙节能模块",
+  "item.dgmodules.chaotic_energy_saver_module": "混沌节能模块",
+  "module_type.draconicevolution.energy_saver.name": "节能模块",
+  "module.dgmodules.energy_saver.desc": "降低宿主整体 OP 耗能，多个模块会先累加减耗比例",
+  "tooltip.dgmodules.energy_saver.rate": "当前可降低宿主 %s%% 的 OP 耗能",
+  "tooltip.dgmodules.energy_saver.stack": "可作用于防具、工具、近战武器与弓"
 }

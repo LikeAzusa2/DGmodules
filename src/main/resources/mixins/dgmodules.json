@@ -5,6 +5,8 @@
     "mixins":  [
                    "frame.MixinFrameBreakerLivingHurt",
                    "MixinChaoticStaffHost",
+                   "MixinModularOPStorageAccess",
+                   "MixinOPStorageEnergySaver",
                    "MixinShieldControlEntity",
                    "MixinModuleEntityHostAccess",
                    "phase.MixinPhaseShieldBlockDamageLeftClickItem",

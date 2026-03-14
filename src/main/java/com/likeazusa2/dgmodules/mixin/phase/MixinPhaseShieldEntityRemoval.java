@@ -19,7 +19,7 @@ public abstract class MixinPhaseShieldEntityRemoval {
     private static boolean dg$tryIntercept(ServerPlayer sp) {
         boolean active = PhaseShieldLogic.isActive(sp);
         boolean emergency = active || PhaseShieldLogic.tryActivateEmergency(sp);
-        DGModules.LOGGER.info(
+        DGModules.LOGGER.debug(
                 "[PhaseShield] EntityRemoval intercept player={} active={} emergency={} hp={} deathTime={} deadOrDying={}",
                 sp.getGameProfile().getName(),
                 active,
@@ -39,7 +39,7 @@ public abstract class MixinPhaseShieldEntityRemoval {
         Entity self = (Entity) (Object) this;
         if (!(self instanceof ServerPlayer sp)) return;
         if (sp.level().isClientSide) return;
-        DGModules.LOGGER.info(
+        DGModules.LOGGER.debug(
                 "[PhaseShield] EntityRemoval#discard player={} hp={} deathTime={} deadOrDying={} active={}",
                 sp.getGameProfile().getName(),
                 sp.getHealth(),
@@ -49,7 +49,7 @@ public abstract class MixinPhaseShieldEntityRemoval {
         );
         if (!dg$isLethalState(sp)) return;
         if (dg$tryIntercept(sp)) {
-            DGModules.LOGGER.info("[PhaseShield] EntityRemoval#discard canceled player={}", sp.getGameProfile().getName());
+            DGModules.LOGGER.debug("[PhaseShield] EntityRemoval#discard canceled player={}", sp.getGameProfile().getName());
             ci.cancel();
         }
     }
@@ -59,7 +59,7 @@ public abstract class MixinPhaseShieldEntityRemoval {
         Entity self = (Entity) (Object) this;
         if (!(self instanceof ServerPlayer sp)) return;
         if (sp.level().isClientSide) return;
-        DGModules.LOGGER.info(
+        DGModules.LOGGER.debug(
                 "[PhaseShield] EntityRemoval#remove player={} reason={} hp={} deathTime={} deadOrDying={} active={}",
                 sp.getGameProfile().getName(),
                 reason,
@@ -70,7 +70,7 @@ public abstract class MixinPhaseShieldEntityRemoval {
         );
         if (reason != Entity.RemovalReason.KILLED && reason != Entity.RemovalReason.DISCARDED && !dg$isLethalState(sp)) return;
         if (dg$tryIntercept(sp)) {
-            DGModules.LOGGER.info("[PhaseShield] EntityRemoval#remove canceled player={}", sp.getGameProfile().getName());
+            DGModules.LOGGER.debug("[PhaseShield] EntityRemoval#remove canceled player={}", sp.getGameProfile().getName());
             ci.cancel();
         }
     }
@@ -80,7 +80,7 @@ public abstract class MixinPhaseShieldEntityRemoval {
         Entity self = (Entity) (Object) this;
         if (!(self instanceof ServerPlayer sp)) return;
         if (sp.level().isClientSide) return;
-        DGModules.LOGGER.info(
+        DGModules.LOGGER.debug(
                 "[PhaseShield] EntityRemoval#remove2 player={} reason={} keepData={} hp={} deathTime={} deadOrDying={} active={}",
                 sp.getGameProfile().getName(),
                 reason,
@@ -92,7 +92,7 @@ public abstract class MixinPhaseShieldEntityRemoval {
         );
         if (reason != Entity.RemovalReason.KILLED && reason != Entity.RemovalReason.DISCARDED && !dg$isLethalState(sp)) return;
         if (dg$tryIntercept(sp)) {
-            DGModules.LOGGER.info("[PhaseShield] EntityRemoval#remove2 canceled player={}", sp.getGameProfile().getName());
+            DGModules.LOGGER.debug("[PhaseShield] EntityRemoval#remove2 canceled player={}", sp.getGameProfile().getName());
             ci.cancel();
         }
     }
@@ -102,7 +102,7 @@ public abstract class MixinPhaseShieldEntityRemoval {
         Entity self = (Entity) (Object) this;
         if (!(self instanceof ServerPlayer sp)) return;
         if (sp.level().isClientSide) return;
-        DGModules.LOGGER.info(
+        DGModules.LOGGER.debug(
                 "[PhaseShield] EntityRemoval#setRemoved player={} reason={} hp={} deathTime={} deadOrDying={} active={}",
                 sp.getGameProfile().getName(),
                 reason,
@@ -113,7 +113,7 @@ public abstract class MixinPhaseShieldEntityRemoval {
         );
         if (reason != Entity.RemovalReason.KILLED && reason != Entity.RemovalReason.DISCARDED && !dg$isLethalState(sp)) return;
         if (dg$tryIntercept(sp)) {
-            DGModules.LOGGER.info("[PhaseShield] EntityRemoval#setRemoved canceled player={}", sp.getGameProfile().getName());
+            DGModules.LOGGER.debug("[PhaseShield] EntityRemoval#setRemoved canceled player={}", sp.getGameProfile().getName());
             ci.cancel();
         }
     }

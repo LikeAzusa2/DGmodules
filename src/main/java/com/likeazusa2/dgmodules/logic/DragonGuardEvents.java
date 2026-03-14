@@ -9,9 +9,11 @@ import com.likeazusa2.dgmodules.DGModules;
 import com.likeazusa2.dgmodules.modules.DragonGuardModuleEntity;
 import com.likeazusa2.dgmodules.network.NetworkHandler;
 import com.likeazusa2.dgmodules.network.S2CDragonGuardWarn;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -35,7 +37,8 @@ public class DragonGuardEvents {
      */
     @SubscribeEvent
     public static void onDamagePre(LivingDamageEvent.Pre event) {
-        if (!(event.getEntity() instanceof ServerPlayer sp)) {
+        LivingEntity target = event.getEntity();
+        if (!(target.level() instanceof ServerLevel serverLevel)) {
             return;
         }
 
@@ -44,17 +47,17 @@ public class DragonGuardEvents {
             return;
         }
 
-        float hp = sp.getHealth() + sp.getAbsorptionAmount();
+        float hp = target.getHealth() + target.getAbsorptionAmount();
         if (finalDamage < hp) {
             return;
         }
 
-        long now = sp.serverLevel().getGameTime();
-        if (alreadyTriggeredRecently(sp, now)) {
+        long now = serverLevel.getGameTime();
+        if (alreadyTriggeredRecently(target, now)) {
             return;
         }
 
-        ItemStack hostStack = DGHostLocator.findChestLikeHost(sp, DragonGuardModuleEntity::hostHasDragonGuard);
+        ItemStack hostStack = DGHostLocator.findChestLikeHost(target, DragonGuardModuleEntity::hostHasDragonGuard);
         if (hostStack.isEmpty()) {
             return;
         }
@@ -64,19 +67,21 @@ public class DragonGuardEvents {
                 return;
             }
 
-            StackModuleContext ctx = new StackModuleContext(hostStack, sp, EquipmentSlot.CHEST);
+            StackModuleContext ctx = new StackModuleContext(hostStack, target, EquipmentSlot.CHEST);
             if (!DragonGuardModuleEntity.extractOp(ctx, getCost())) {
                 return;
             }
 
-            markTriggered(sp, now);
-            sp.level().playSound(null, sp.getX(), sp.getY(), sp.getZ(), DESounds.SHIELD_STRIKE.get(), SoundSource.PLAYERS, 1.0f, 0.85f);
-            NetworkHandler.sendToPlayer(sp, new S2CDragonGuardWarn(20));
+            markTriggered(target, now);
+            target.level().playSound(null, target.getX(), target.getY(), target.getZ(), DESounds.SHIELD_STRIKE.get(), SoundSource.PLAYERS, 1.0f, 0.85f);
+            if (target instanceof ServerPlayer sp) {
+                NetworkHandler.sendToPlayer(sp, new S2CDragonGuardWarn(20));
+            }
 
             event.setNewDamage(0);
-            sp.setHealth(1.0F);
-            sp.hurtMarked = true;
-            sp.invulnerableTime = Math.max(sp.invulnerableTime, 2);
+            target.setHealth(Math.min(target.getMaxHealth(), 1.0F));
+            target.hurtMarked = true;
+            target.invulnerableTime = Math.max(target.invulnerableTime, 2);
         }
     }
 
@@ -85,14 +90,15 @@ public class DragonGuardEvents {
      */
     @SubscribeEvent
     public static void onDeath(LivingDeathEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer sp)) {
+        LivingEntity target = event.getEntity();
+        if (!(target.level() instanceof ServerLevel serverLevel)) {
             return;
         }
 
-        long now = sp.serverLevel().getGameTime();
-        boolean alreadyPaid = alreadyTriggeredRecently(sp, now);
+        long now = serverLevel.getGameTime();
+        boolean alreadyPaid = alreadyTriggeredRecently(target, now);
 
-        ItemStack hostStack = DGHostLocator.findChestLikeHost(sp, DragonGuardModuleEntity::hostHasDragonGuard);
+        ItemStack hostStack = DGHostLocator.findChestLikeHost(target, DragonGuardModuleEntity::hostHasDragonGuard);
         if (hostStack.isEmpty()) {
             return;
         }
@@ -103,27 +109,29 @@ public class DragonGuardEvents {
             }
 
             if (!alreadyPaid) {
-                StackModuleContext ctx = new StackModuleContext(hostStack, sp, EquipmentSlot.CHEST);
+                StackModuleContext ctx = new StackModuleContext(hostStack, target, EquipmentSlot.CHEST);
                 if (!DragonGuardModuleEntity.extractOp(ctx, getCost())) {
                     return;
                 }
-                markTriggered(sp, now);
-                NetworkHandler.sendToPlayer(sp, new S2CDragonGuardWarn(20));
+                markTriggered(target, now);
+                if (target instanceof ServerPlayer sp) {
+                    NetworkHandler.sendToPlayer(sp, new S2CDragonGuardWarn(20));
+                }
             }
 
             event.setCanceled(true);
-            sp.setHealth(1.0F);
-            sp.hurtMarked = true;
-            sp.invulnerableTime = Math.max(sp.invulnerableTime, 2);
+            target.setHealth(Math.min(target.getMaxHealth(), 1.0F));
+            target.hurtMarked = true;
+            target.invulnerableTime = Math.max(target.invulnerableTime, 2);
         }
     }
 
-    private static boolean alreadyTriggeredRecently(ServerPlayer sp, long now) {
-        long last = sp.getPersistentData().getLong(TAG_LAST_GUARD_TICK);
+    private static boolean alreadyTriggeredRecently(LivingEntity entity, long now) {
+        long last = entity.getPersistentData().getLong(TAG_LAST_GUARD_TICK);
         return (now - last) <= 1;
     }
 
-    private static void markTriggered(ServerPlayer sp, long now) {
-        sp.getPersistentData().putLong(TAG_LAST_GUARD_TICK, now);
+    private static void markTriggered(LivingEntity entity, long now) {
+        entity.getPersistentData().putLong(TAG_LAST_GUARD_TICK, now);
     }
 }
