@@ -13,7 +13,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -31,13 +30,11 @@ public class DragonGuardEvents {
         return DGConfig.SERVER.dragonGuardCost.get();
     }
 
-    /**
-     * 在致死伤害真正落地前拦截一次。
-     * 现在不再要求宿主必须是原版混沌胸甲，只要胸甲语义宿主里确实装了龙之守护模块即可。
-     */
     @SubscribeEvent
     public static void onDamagePre(LivingDamageEvent.Pre event) {
-        LivingEntity target = event.getEntity();
+        if (!(event.getEntity() instanceof ServerPlayer target)) {
+            return;
+        }
         if (!(target.level() instanceof ServerLevel serverLevel)) {
             return;
         }
@@ -73,10 +70,17 @@ public class DragonGuardEvents {
             }
 
             markTriggered(target, now);
-            target.level().playSound(null, target.getX(), target.getY(), target.getZ(), DESounds.SHIELD_STRIKE.get(), SoundSource.PLAYERS, 1.0f, 0.85f);
-            if (target instanceof ServerPlayer sp) {
-                NetworkHandler.sendToPlayer(sp, new S2CDragonGuardWarn(20));
-            }
+            target.level().playSound(
+                    null,
+                    target.getX(),
+                    target.getY(),
+                    target.getZ(),
+                    DESounds.SHIELD_STRIKE.get(),
+                    SoundSource.PLAYERS,
+                    1.0f,
+                    0.85f
+            );
+            NetworkHandler.sendToPlayer(target, new S2CDragonGuardWarn(20));
 
             event.setNewDamage(0);
             target.setHealth(Math.min(target.getMaxHealth(), 1.0F));
@@ -85,12 +89,11 @@ public class DragonGuardEvents {
         }
     }
 
-    /**
-     * 死亡事件兜底，防止某些链路绕过了 Pre 阶段。
-     */
     @SubscribeEvent
     public static void onDeath(LivingDeathEvent event) {
-        LivingEntity target = event.getEntity();
+        if (!(event.getEntity() instanceof ServerPlayer target)) {
+            return;
+        }
         if (!(target.level() instanceof ServerLevel serverLevel)) {
             return;
         }
@@ -114,9 +117,7 @@ public class DragonGuardEvents {
                     return;
                 }
                 markTriggered(target, now);
-                if (target instanceof ServerPlayer sp) {
-                    NetworkHandler.sendToPlayer(sp, new S2CDragonGuardWarn(20));
-                }
+                NetworkHandler.sendToPlayer(target, new S2CDragonGuardWarn(20));
             }
 
             event.setCanceled(true);
@@ -126,12 +127,12 @@ public class DragonGuardEvents {
         }
     }
 
-    private static boolean alreadyTriggeredRecently(LivingEntity entity, long now) {
+    private static boolean alreadyTriggeredRecently(ServerPlayer entity, long now) {
         long last = entity.getPersistentData().getLong(TAG_LAST_GUARD_TICK);
         return (now - last) <= 1;
     }
 
-    private static void markTriggered(LivingEntity entity, long now) {
+    private static void markTriggered(ServerPlayer entity, long now) {
         entity.getPersistentData().putLong(TAG_LAST_GUARD_TICK, now);
     }
 }

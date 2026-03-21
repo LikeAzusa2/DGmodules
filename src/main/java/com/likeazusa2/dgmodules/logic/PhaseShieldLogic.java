@@ -19,7 +19,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -85,11 +84,6 @@ public class PhaseShieldLogic {
 
     /** Play a one-shot shield-hit sound on server side. */
     public static void playShieldHit(ServerPlayer target) {
-        playShieldHit((LivingEntity) target);
-    }
-
-    /** Play a one-shot shield-hit sound for any living entity. */
-    public static void playShieldHit(LivingEntity target) {
         target.level().playSound(
                 null,
                 target.blockPosition(),
