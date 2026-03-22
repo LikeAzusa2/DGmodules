@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.likeazusa2.dgmodules.mixin",
+  "refmap": "mixins.dgmodules.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "frame.MixinFrameBreakerLivingHurt",
+    "MixinChaoticStaffHost",
+    "MixinModularOPStorageAccess",
+    "MixinOPStorageEnergySaver",
+    "MixinShieldControlEntity",
+    "MixinModuleEntityHostAccess",
+    "phase.MixinPhaseShieldBlockDamageLeftClickItem",
+    "phase.MixinPhaseShieldPickable",
+    "phase.MixinPhaseShieldPlayerAttack",
+    "phase.MixinPhaseShieldHurt",
+    "phase.MixinPhaseShieldServerPlayerDeath",
+    "phase.MixinPhaseShieldEntityRemoval"
+  ],
+  "client": [
+    "client.MixinModularChestpieceModelRenderContext"
+  ]
+}
