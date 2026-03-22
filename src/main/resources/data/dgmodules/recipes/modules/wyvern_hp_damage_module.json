@@ -8,7 +8,7 @@
   ],
   "key": {
     "I": {
-      "tag": "c:ingots/draconium"
+      "tag": "forge:ingots/draconium"
     },
     "M": {
       "item": "draconicevolution:module_core"
@@ -20,18 +20,11 @@
       "item": "draconicevolution:item_draconium_damage"
     },
     "P": {
-      "type": "neoforge:components",
-      "items": "minecraft:potion",
-      "components": {
-        "minecraft:max_stack_size": 1,
-        "minecraft:potion_contents": {
-          "potion": "minecraft:harming"
-        }
-      }
+      "type": "forge:nbt", "count": 1, "item": "minecraft:potion", "nbt": "{Potion:\"minecraft:harming\"}"
     }
   },
   "result": {
     "count": 1,
-    "id": "dgmodules:wyvern_hp_damage_module"
+    "item": "dgmodules:wyvern_hp_damage_module"
   }
 }

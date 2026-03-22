@@ -5,58 +5,34 @@
   },
   "ingredients": [
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:awakened_core"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:draconic_energy_core"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:draconium_core"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:draconium_core"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:awakened_core"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:awakened_draconium_ingot"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "minecraft:redstone_block"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "minecraft:glowstone"
       }
-    }
   ],
   "result": {
     "count": 1,
-    "id": "dgmodules:draconic_energy_saver_module"
+    "item": "dgmodules:draconic_energy_saver_module"
   },
-  "techLevel": "draconic",
-  "totalEnergy": 64000000
+  "tier": "DRACONIC",
+  "total_energy": 64000000
 }

@@ -8,7 +8,7 @@
   ],
   "key": {
     "I": {
-      "tag": "c:ingots/draconium"
+      "tag": "forge:ingots/draconium"
     },
     "P": {
       "item": "draconicevolution:wyvern_energy_core"
@@ -25,6 +25,6 @@
   },
   "result": {
     "count": 1,
-    "id": "dgmodules:wyvern_energy_saver_module"
+    "item": "dgmodules:wyvern_energy_saver_module"
   }
 }

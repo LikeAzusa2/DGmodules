@@ -5,58 +5,34 @@
   },
   "ingredients": [
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:chaotic_core"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:chaotic_core"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:chaotic_energy_core"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:chaotic_energy_core"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:item_chaotic_shield_control"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "dgmodules:shield_control_booster_module"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:item_chaotic_undying"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
-        "tag": "c:ingots/draconium_awakened"
+        "tag": "forge:ingots/draconium_awakened"
       }
-    }
   ],
   "result": {
-    "id": "dgmodules:phase_shield_module",
+    "item": "dgmodules:phase_shield_module",
     "count": 1
   },
-  "techLevel": "chaotic",
-  "totalEnergy": 800000000
+  "tier": "CHAOTIC",
+  "total_energy": 800000000
 }

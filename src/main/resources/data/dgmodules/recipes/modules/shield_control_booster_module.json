@@ -4,43 +4,19 @@
     "item": "draconicevolution:item_chaotic_shield_control"
   },
   "ingredients": [
-    {
-      "consume": true,
-      "ingredient": { "item": "draconicevolution:chaotic_core" }
-    },
-    {
-      "consume": true,
-      "ingredient": { "item": "draconicevolution:chaotic_core" }
-    },
-    {
-      "consume": true,
-      "ingredient": { "item": "draconicevolution:chaotic_energy_core" }
-    },
-    {
-      "consume": true,
-      "ingredient": { "item": "draconicevolution:chaotic_energy_core" }
-    },
-    {
-      "consume": true,
-      "ingredient": { "item": "draconicevolution:large_chaos_frag" }
-    },
-    {
-      "consume": true,
-      "ingredient": { "item": "draconicevolution:large_chaos_frag" }
-    },
-    {
-      "consume": true,
-      "ingredient": { "item": "draconicevolution:dragon_heart" }
-    },
-    {
-      "consume": true,
-      "ingredient": { "item": "minecraft:nether_star" }
-    }
+    { "item": "draconicevolution:chaotic_core" },
+    { "item": "draconicevolution:chaotic_core" },
+    { "item": "draconicevolution:chaotic_energy_core" },
+    { "item": "draconicevolution:chaotic_energy_core" },
+    { "item": "draconicevolution:large_chaos_frag" },
+    { "item": "draconicevolution:large_chaos_frag" },
+    { "item": "draconicevolution:dragon_heart" },
+    { "item": "minecraft:nether_star" }
   ],
   "result": {
     "count": 1,
-    "id": "dgmodules:shield_control_booster_module"
+    "item": "dgmodules:shield_control_booster_module"
   },
-  "techLevel": "chaotic",
-  "totalEnergy": 600000000
+  "tier": "CHAOTIC",
+  "total_energy": 600000000
 }

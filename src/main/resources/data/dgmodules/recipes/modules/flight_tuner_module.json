@@ -5,70 +5,40 @@
   },
   "ingredients": [
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:chaotic_core"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:chaotic_core"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:chaotic_energy_core"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:chaotic_energy_core"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:chaotic_energy_core"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:chaotic_energy_core"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:large_chaos_frag"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:large_chaos_frag"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:item_draconic_flight"
-      }
-    },
+      },
     {
-      "consume": true,
-      "ingredient": {
         "item": "draconicevolution:item_wyvern_flight"
       }
-    }
   ],
   "result": {
-    "id": "dgmodules:flight_tuner_module",
+    "item": "dgmodules:flight_tuner_module",
     "count": 1
   },
-  "techLevel": "chaotic",
-  "totalEnergy": 600000000
+  "tier": "CHAOTIC",
+  "total_energy": 600000000
 }
