@@ -20,8 +20,19 @@ public final class DGConfig {
         public final ModConfigSpec.LongValue chaosLaserCostExecutePerTick;
         public final ModConfigSpec.IntValue chaosLaserRange;
         public final ModConfigSpec.DoubleValue chaosLaserNormalBaseDamage;
+        public final ModConfigSpec.BooleanValue dangerousModulesAffectCreativePlayers;
+        public final ModConfigSpec.BooleanValue hostIntegrityProtectArmor;
+        public final ModConfigSpec.BooleanValue hostIntegrityProtectHands;
+        public final ModConfigSpec.BooleanValue hostIntegrityProtectCurios;
+        public final ModConfigSpec.BooleanValue hostIntegrityProtectInventory;
+        public final ModConfigSpec.BooleanValue hostIntegrityLogBlockedOperations;
         public final ModConfigSpec.LongValue dragonGuardCost;
         public static ModConfigSpec.LongValue phaseShieldCostPerTick;
+        public final ModConfigSpec.IntValue chaosCrystalBreakerCountdownTicks;
+        public final ModConfigSpec.IntValue chaosCrystalBreakerDurationTicks;
+        public final ModConfigSpec.DoubleValue chaosCrystalBreakerBlastRadius;
+        public final ModConfigSpec.DoubleValue chaosCrystalBreakerDamage;
+        public final ModConfigSpec.IntValue chaosCrystalBreakerEffectTicks;
 
         public final ModConfigSpec.LongValue dimensionAnchorCostPerTick;
         public final ModConfigSpec.IntValue dimensionAnchorRadius;
@@ -65,6 +76,35 @@ public final class DGConfig {
                     .comment("Chaos Laser normal mode base damage in health points. Default 16 = 8 hearts.")
                     .defineInRange("normal_base_damage", 16.0D, 0.0D, 2048.0D);
 
+            b.push("dangerous_modules");
+            dangerousModulesAffectCreativePlayers = b
+                    .comment("If true, dangerous modules can damage creative-mode players. "
+                            + "Currently applies to Chaos Laser and Cataclysm Arrow.")
+                    .define("affect_creative_players", false);
+            b.pop();
+
+            b.push("host_integrity");
+            hostIntegrityProtectArmor = b
+                    .comment("Protect armor hosts carrying the Host Integrity module.")
+                    .define("protect_armor", true);
+
+            hostIntegrityProtectHands = b
+                    .comment("Protect main-hand and off-hand hosts carrying the Host Integrity module.")
+                    .define("protect_hands", true);
+
+            hostIntegrityProtectCurios = b
+                    .comment("Protect Curios hosts carrying the Host Integrity module.")
+                    .define("protect_curios", true);
+
+            hostIntegrityProtectInventory = b
+                    .comment("Also protect matching hosts while they are in normal inventory slots.")
+                    .define("protect_inventory", false);
+
+            hostIntegrityLogBlockedOperations = b
+                    .comment("Write a rate-limited server log entry when an external host mutation is blocked.")
+                    .define("log_blocked_operations", false);
+            b.pop();
+
             b.push("dragon_guard");
             dragonGuardCost = b
                     .comment("Dragon Guard activation cost (OP).")
@@ -75,6 +115,28 @@ public final class DGConfig {
             phaseShieldCostPerTick = b
                     .comment("Phase Shield OP cost per tick.")
                     .defineInRange("cost_per_tick", 8_000_000L, 0L, Long.MAX_VALUE);
+            b.pop();
+
+            b.push("chaos_crystal_breaker");
+            chaosCrystalBreakerCountdownTicks = b
+                    .comment("Time before the breaker installed below a guardian crystal entity detonates, in ticks.")
+                    .defineInRange("countdown_ticks", 100, 1, 24_000);
+
+            chaosCrystalBreakerDurationTicks = b
+                    .comment("How long the targeted guardian crystal entity remains vulnerable after detonation, in ticks.")
+                    .defineInRange("duration_ticks", 1_200, 20, 24_000);
+
+            chaosCrystalBreakerBlastRadius = b
+                    .comment("Chaos Crystal breaker guardian-damage radius in blocks.")
+                    .defineInRange("blast_radius", 6.0D, 0.5D, 64.0D);
+
+            chaosCrystalBreakerDamage = b
+                    .comment("Chaos Guardian damage dealt to living entities at the detonation center.")
+                    .defineInRange("damage", 20.0D, 0.0D, 4_096.0D);
+
+            chaosCrystalBreakerEffectTicks = b
+                    .comment("Duration of the client-side singularity diffusion effect, in ticks.")
+                    .defineInRange("effect_ticks", 40, 1, 200);
             b.pop();
 
             b.push("dimension_anchor");

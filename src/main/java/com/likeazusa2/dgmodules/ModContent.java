@@ -8,6 +8,7 @@ import com.likeazusa2.dgmodules.blocks.DontIgniteBlockEntity;
 import com.likeazusa2.dgmodules.modules.*;
 import com.likeazusa2.dgmodules.entity.DomeEmitterProjectileEntity;
 import com.likeazusa2.dgmodules.entity.DraconicShieldDomeCoreEntity;
+import com.likeazusa2.dgmodules.item.ChaosCrystalBreakerItem;
 import com.likeazusa2.dgmodules.item.DraconicShieldDomeEmitterItem;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -54,6 +55,11 @@ public class ModContent {
 
     public static final DeferredHolder<Item, net.minecraft.world.item.BlockItem> DONT_IGNITE_ITEM =
             ITEMS.register("dont_ignite", () -> new net.minecraft.world.item.BlockItem(DONT_IGNITE.get(), new Item.Properties()));
+
+    public static final DeferredHolder<Item, ChaosCrystalBreakerItem> CHAOS_CRYSTAL_BREAKER =
+            ITEMS.register("chaos_crystal_breaker",
+                    () -> new ChaosCrystalBreakerItem(new Item.Properties().stacksTo(16))
+            );
 
     public static final DeferredHolder<net.minecraft.world.level.block.entity.BlockEntityType<?>, net.minecraft.world.level.block.entity.BlockEntityType<DontIgniteBlockEntity>> DONT_IGNITE_BE =
             BLOCK_ENTITIES.register("dont_ignite", () ->
@@ -136,6 +142,22 @@ public class ModContent {
 
     private static Module<?> getDragonGuardModule() {
         return DRAGON_GUARD_MODULE.get();
+    }
+
+    // Host Integrity
+
+    public static final DeferredHolder<Item, HostIntegrityModuleItem> HOST_INTEGRITY_MODULE_ITEM =
+            ITEMS.register("host_integrity_module",
+                    () -> new HostIntegrityModuleItem(new Item.Properties().stacksTo(1), ModContent::getHostIntegrityModule)
+            );
+
+    public static final DeferredHolder<Module<?>, HostIntegrityModule> HOST_INTEGRITY_MODULE =
+            DG_MODULES.register("host_integrity",
+                    () -> new HostIntegrityModule(HOST_INTEGRITY_MODULE_ITEM.get())
+            );
+
+    private static Module<?> getHostIntegrityModule() {
+        return HOST_INTEGRITY_MODULE.get();
     }
 
     // Phase Shield
@@ -481,6 +503,7 @@ public static final DeferredHolder<CreativeModeTab, CreativeModeTab> DG_MODULES_
                                 // 把你想显示的东西都加在这里
                                 output.accept(CHAOS_LASER_MODULE_ITEM.get());
                                 output.accept(DRAGON_GUARD_MODULE_ITEM.get());
+                                output.accept(HOST_INTEGRITY_MODULE_ITEM.get());
                                 output.accept(PHASE_SHIELD_MODULE_ITEM.get());
                                 output.accept(DIMENSION_ANCHOR_MODULE_ITEM.get());
                                 output.accept(FLIGHT_TUNER_MODULE_ITEM.get());
@@ -504,6 +527,7 @@ public static final DeferredHolder<CreativeModeTab, CreativeModeTab> DG_MODULES_
                                 output.accept(DRACONIC_BLAST_SPACE_MODULE_ITEM.get());
                                 output.accept(CHAOTIC_BLAST_SPACE_MODULE_ITEM.get());
                                 output.accept(DRACONIC_SHIELD_DOME_EMITTER.get());
+                                output.accept(CHAOS_CRYSTAL_BREAKER.get());
                             })
                             .build()
             );

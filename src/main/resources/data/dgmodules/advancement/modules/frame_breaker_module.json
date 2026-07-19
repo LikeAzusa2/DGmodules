@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "id": "dgmodules:frame_breaker_module"
+    },
+    "title": {
+      "translate": "advancements.dgmodules.modules.frame_breaker_module.title"
+    },
+    "description": {
+      "translate": "advancements.dgmodules.modules.frame_breaker_module.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_frame_breaker_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:frame_breaker_module"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "dgmodules:modules/draconic"
+}

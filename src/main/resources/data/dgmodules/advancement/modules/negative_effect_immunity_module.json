@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "id": "dgmodules:negative_effect_immunity_module"
+    },
+    "title": {
+      "translate": "advancements.dgmodules.modules.negative_effect_immunity_module.title"
+    },
+    "description": {
+      "translate": "advancements.dgmodules.modules.negative_effect_immunity_module.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "has_negative_effect_immunity_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:negative_effect_immunity_module"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "dgmodules:modules/draconic"
+}

@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "id": "dgmodules:host_integrity_module"
+    },
+    "title": {
+      "translate": "advancements.dgmodules.modules.host_integrity_module.title"
+    },
+    "description": {
+      "translate": "advancements.dgmodules.modules.host_integrity_module.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_host_integrity_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:host_integrity_module"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "dgmodules:modules/chaotic"
+}

@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "id": "dgmodules:cataclysm_arrow_module"
+    },
+    "title": {
+      "translate": "advancements.dgmodules.modules.cataclysm_arrow_module.title"
+    },
+    "description": {
+      "translate": "advancements.dgmodules.modules.cataclysm_arrow_module.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_cataclysm_arrow_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:cataclysm_arrow_module"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "dgmodules:modules/chaotic"
+}

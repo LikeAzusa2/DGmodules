@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "id": "dgmodules:dimension_anchor_module"
+    },
+    "title": {
+      "translate": "advancements.dgmodules.modules.dimension_anchor_module.title"
+    },
+    "description": {
+      "translate": "advancements.dgmodules.modules.dimension_anchor_module.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "has_dimension_anchor_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:dimension_anchor_module"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "dgmodules:modules/chaotic"
+}

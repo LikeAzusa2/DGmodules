@@ -72,6 +72,18 @@ public class NetworkHandler {
         );
 
         registrar.playToClient(
+                S2CChaosCrystalSingularity.TYPE,
+                S2CChaosCrystalSingularity.STREAM_CODEC,
+                S2CChaosCrystalSingularity::handle
+        );
+
+        registrar.playToClient(
+                S2CChaosCrystalCountdown.TYPE,
+                S2CChaosCrystalCountdown.STREAM_CODEC,
+                S2CChaosCrystalCountdown::handle
+        );
+
+        registrar.playToClient(
                 S2CDimensionAnchorRing.TYPE,
                 S2CDimensionAnchorRing.STREAM_CODEC,
                 S2CDimensionAnchorRing::handle

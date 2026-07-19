@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "id": "dgmodules:chaos_laser_module"
+    },
+    "title": {
+      "translate": "advancements.dgmodules.title"
+    },
+    "description": {
+      "translate": "advancements.dgmodules.description"
+    },
+    "background": "minecraft:textures/gui/advancements/backgrounds/end.png",
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "open_module_tree": {
+      "trigger": "minecraft:tick"
+    }
+  }
+}

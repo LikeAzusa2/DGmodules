@@ -9,6 +9,14 @@
                    "MixinOPStorageEnergySaver",
                    "MixinShieldControlEntity",
                    "MixinModuleEntityHostAccess",
+                   "MixinHostIntegrityItemStack",
+                   "MixinHostIntegrityPlayerDrop",
+                   "MixinHostIntegrityItemEntity",
+                   "MixinHostIntegrityNonNullList",
+                   "MixinHostIntegrityItemStackHandler",
+                   "MixinHostIntegrityModuleHost",
+                   "MixinHostIntegrityContainerMenu",
+                   "MixinGuardianCrystalDefense",
                    "phase.MixinPhaseShieldBlockDamageLeftClickItem",
                    "phase.MixinPhaseShieldPickable",
                    "phase.MixinPhaseShieldPlayerAttack",
@@ -20,6 +28,7 @@
                    "client.MixinModularChestpieceModelRenderContext"
                ],
     "server":  [
-
+                   "server.MixinHostIntegrityServerPacket",
+                   "server.MixinHostIntegrityServerPlayerDrop"
                ]
 }

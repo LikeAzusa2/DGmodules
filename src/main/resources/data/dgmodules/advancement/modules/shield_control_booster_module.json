@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "id": "dgmodules:shield_control_booster_module"
+    },
+    "title": {
+      "translate": "advancements.dgmodules.modules.shield_control_booster_module.title"
+    },
+    "description": {
+      "translate": "advancements.dgmodules.modules.shield_control_booster_module.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "has_shield_control_booster_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:shield_control_booster_module"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "dgmodules:modules/chaotic"
+}

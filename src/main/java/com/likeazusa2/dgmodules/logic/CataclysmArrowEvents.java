@@ -133,7 +133,7 @@ public class CataclysmArrowEvents {
 
         event.getAffectedEntities().removeIf(e -> e instanceof ItemEntity);
         for (Entity e : event.getAffectedEntities()) {
-            if (e instanceof LivingEntity living) {
+            if (e instanceof LivingEntity living && DangerousModuleProtection.canAffect(living)) {
                 float max = living.getMaxHealth();
                 if (max <= 0) continue;
                 float newHealth = living.getHealth() - (max * 0.01F);
@@ -163,7 +163,8 @@ public class CataclysmArrowEvents {
             }
 
             Entity victimRaw = currentLevel.getEntity(e.getKey());
-            if (!(victimRaw instanceof LivingEntity target) || !target.isAlive()) {
+            if (!(victimRaw instanceof LivingEntity target)
+                    || !DangerousModuleProtection.canAffect(target)) {
                 it.remove();
                 continue;
             }
@@ -253,7 +254,11 @@ public class CataclysmArrowEvents {
         );
 
         int hitCount = 0;
-        for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, box, e -> e.isAlive() && e != shooter)) {
+        for (LivingEntity target : level.getEntitiesOfClass(
+                LivingEntity.class,
+                box,
+                e -> e != shooter && DangerousModuleProtection.canAffect(e)
+        )) {
             if (hitCount >= DGConfig.SERVER.cataclysmMaxTargets.get()) break;
 
             Vec3 delta = target.position().subtract(pos);
@@ -332,6 +337,7 @@ public class CataclysmArrowEvents {
 
         for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, box, LivingEntity::isAlive)) {
             if (attacker != null && target == attacker) continue;
+            if (!DangerousModuleProtection.canAffect(target)) continue;
 
             Vec3 delta = target.position().subtract(center);
             double nx = delta.x / rx;

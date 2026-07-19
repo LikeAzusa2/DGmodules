@@ -25,6 +25,7 @@ public class DGCapabilities {
                 },
                 ModContent.CHAOS_LASER_MODULE_ITEM.get(),
                 ModContent.DRAGON_GUARD_MODULE_ITEM.get(),
+                ModContent.HOST_INTEGRITY_MODULE_ITEM.get(),
                 ModContent.DRACONIC_HP_DAMAGE_MODULE_ITEM.get(),
                 ModContent.WYVERN_HP_DAMAGE_MODULE_ITEM.get(),
                 ModContent.CHAOTIC_HP_DAMAGE_MODULE_ITEM.get(),

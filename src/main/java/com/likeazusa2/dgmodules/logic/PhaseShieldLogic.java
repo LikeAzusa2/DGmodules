@@ -32,6 +32,7 @@ public class PhaseShieldLogic {
     private static final String TAG_LAST_HEARTBEAT_SYNC = "dg_phase_shield_last_heartbeat_sync";
     private static final String TAG_HEALTH_LOCK = "dg_phase_shield_health_lock";
     private static final String TAG_MAX_HEALTH_LOCK = "dg_phase_shield_max_health_lock";
+    private static final String TAG_EMERGENCY_ENABLED = "dg_phase_shield_emergency_enabled";
 
     private static final ResourceLocation PHASE_MAX_HEALTH_GUARD_ID =
             ResourceLocation.fromNamespaceAndPath("dgmodules", "phase_shield_max_health_guard");
@@ -62,7 +63,7 @@ public class PhaseShieldLogic {
 
         boolean active = isActive(sp);
         boolean emergency = active || tryActivateEmergency(sp);
-        DGModules.LOGGER.debug(
+        DGModules.LOGGER.info(
                 "[PhaseShield] lethal intercept attempt player={} active={} emergency={} hp={} deadOrDying={} deathTime={}",
                 sp.getGameProfile().getName(),
                 active,
@@ -78,7 +79,7 @@ public class PhaseShieldLogic {
 
         playShieldHit(sp);
         stabilizeAfterDeathIntercept(sp);
-        DGModules.LOGGER.debug("[PhaseShield] lethal intercept success player={}", sp.getGameProfile().getName());
+        DGModules.LOGGER.info("[PhaseShield] lethal intercept success player={}", sp.getGameProfile().getName());
         return true;
     }
 
@@ -114,7 +115,12 @@ public class PhaseShieldLogic {
     /** Emergency activation used before lethal damage is finalized. */
     public static boolean tryActivateEmergency(ServerPlayer sp) {
         if (sp == null || sp.isSpectator()) return false;
-        if (isActive(sp)) return true;
+
+        boolean active = isActive(sp);
+        if (active) return true;
+
+        if (!isEmergencyEnabled(sp)) return false;
+
         if (!canActivate(sp)) {
             debugEmergencyFail(sp, "tryActivateEmergency");
             return false;
@@ -122,23 +128,45 @@ public class PhaseShieldLogic {
 
         ItemStack chest = findPhaseShieldHost(sp);
         int seconds = (int) Math.min(Integer.MAX_VALUE, estimateSecondsRemaining(sp, chest));
-        if (seconds <= 0) {
-            DGModules.LOGGER.debug(
-                    "[PhaseShield] emergency denied player={} reason=seconds<=0 totalOp={} costPerTick={}",
-                    sp.getGameProfile().getName(),
-                    getTotalOpAvailable(sp, chest),
-                    getOpCostPerTick()
-            );
-            return false;
-        }
+        if (seconds <= 0) return false;
 
         setActive(sp, true, seconds, true);
-        DGModules.LOGGER.debug(
-                "[PhaseShield] emergency activated player={} seconds={}",
-                sp.getGameProfile().getName(),
-                seconds
-        );
         return true;
+    }
+
+    /** 从 persistentData 读取紧急启动开关（由 tick() 每 10 tick 同步一次）。 */
+    private static boolean isEmergencyEnabled(ServerPlayer sp) {
+        return sp.getPersistentData().getBoolean(TAG_EMERGENCY_ENABLED);
+    }
+
+    /**
+     * 同步紧急启动开关到 persistentData。
+     * 优先读 ItemStack 上的 BOOL_ITEM_PROP_1 数据组件（GUI 切换时即时写入），
+     * 绕过 ModuleHost/CODEC 的反序列化缓存，确保读到的是 GUI 最新值。
+     * 仅在无 ItemData（旧存档）时回退到 ModuleHost 路径。
+     */
+    private static void syncEmergencyEnabled(ServerPlayer sp) {
+        ItemStack chest = findPhaseShieldHost(sp);
+        if (chest.isEmpty()) {
+            sp.getPersistentData().remove(TAG_EMERGENCY_ENABLED);
+            return;
+        }
+        // 已有值不再覆写 — 防止 entity=true 覆盖 GUI 写入的 false
+        if (sp.getPersistentData().contains(TAG_EMERGENCY_ENABLED)) return;
+
+        Boolean entityBool = null;
+        try (ModuleHost host = DECapabilities.getHost(chest)) {
+            if (host != null) {
+                for (var ent : host.getModuleEntities()) {
+                    if (ent instanceof PhaseShieldModuleEntity ps) {
+                        entityBool = ps.isEmergencyEnabled();
+                        break;
+                    }
+                }
+            }
+        } catch (Throwable ignored) {}
+        boolean finalVal = entityBool != null ? entityBool : true;
+        sp.getPersistentData().putBoolean(TAG_EMERGENCY_ENABLED, finalVal);
     }
 
     /** Check activation prerequisites. */
@@ -161,9 +189,15 @@ public class PhaseShieldLogic {
         }
     }
 
-    /** Per-tick maintenance while active. */
+    /** Per-tick maintenance while active. 同时同步紧急启动开关状态到 persistentData。 */
     public static void tick(ServerPlayer sp) {
         if (sp == null || sp.isSpectator()) return;
+
+        // 每 10 tick 从模块实体读取紧急启动开关并同步至 persistentData
+        if (sp.tickCount % 10 == 0) {
+            syncEmergencyEnabled(sp);
+        }
+
         boolean active = sp.getPersistentData().getBoolean(TAG_ACTIVE);
         if (!active) {
             syncHeartbeatIfNeeded(sp, false, 0);
@@ -262,7 +296,7 @@ public class PhaseShieldLogic {
 
     private static void sendPhaseState(ServerPlayer sp, boolean active, int seconds) {
         if (sp.connection == null) {
-            DGModules.LOGGER.debug(
+            DGModules.LOGGER.info(
                     "[PhaseShield] skip sendPhaseState player={} reason=no_connection active={} seconds={}",
                     sp.getGameProfile().getName(),
                     active,
@@ -348,28 +382,28 @@ public class PhaseShieldLogic {
         if (sp == null) return;
         ItemStack chest = findPhaseShieldHost(sp);
         if (chest.isEmpty()) {
-            DGModules.LOGGER.debug("[PhaseShield] {} denied player={} reason=no_chaotic_chest", stage, sp.getGameProfile().getName());
+            DGModules.LOGGER.info("[PhaseShield] {} denied player={} reason=no_chaotic_chest", stage, sp.getGameProfile().getName());
             return;
         }
 
         try (ModuleHost host = DECapabilities.getHost(chest)) {
             if (host == null) {
-                DGModules.LOGGER.debug("[PhaseShield] {} denied player={} reason=no_module_host", stage, sp.getGameProfile().getName());
+                DGModules.LOGGER.info("[PhaseShield] {} denied player={} reason=no_module_host", stage, sp.getGameProfile().getName());
                 return;
             }
             if (!PhaseShieldModuleEntity.hostHasPhaseShield(host)) {
-                DGModules.LOGGER.debug("[PhaseShield] {} denied player={} reason=no_phase_module", stage, sp.getGameProfile().getName());
+                DGModules.LOGGER.info("[PhaseShield] {} denied player={} reason=no_phase_module", stage, sp.getGameProfile().getName());
                 return;
             }
             if (!hostHasShieldControlBooster(host)) {
-                DGModules.LOGGER.debug("[PhaseShield] {} denied player={} reason=no_booster_module", stage, sp.getGameProfile().getName());
+                DGModules.LOGGER.info("[PhaseShield] {} denied player={} reason=no_booster_module", stage, sp.getGameProfile().getName());
                 return;
             }
 
             long total = getTotalOpAvailable(sp, chest);
             long cost = getOpCostPerTick();
             if (total < cost) {
-                DGModules.LOGGER.debug(
+                DGModules.LOGGER.info(
                         "[PhaseShield] {} denied player={} reason=insufficient_op totalOp={} costPerTick={}",
                         stage,
                         sp.getGameProfile().getName(),
@@ -379,7 +413,7 @@ public class PhaseShieldLogic {
                 return;
             }
 
-            DGModules.LOGGER.debug(
+            DGModules.LOGGER.info(
                     "[PhaseShield] {} denied player={} reason=unknown totalOp={} costPerTick={}",
                     stage,
                     sp.getGameProfile().getName(),
@@ -387,7 +421,7 @@ public class PhaseShieldLogic {
                     cost
             );
         } catch (Throwable t) {
-            DGModules.LOGGER.debug("[PhaseShield] {} denied player={} reason=exception {}", stage, sp.getGameProfile().getName(), t.toString());
+            DGModules.LOGGER.info("[PhaseShield] {} denied player={} reason=exception {}", stage, sp.getGameProfile().getName(), t.toString());
         }
     }
 

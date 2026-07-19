@@ -1,0 +1,350 @@
+{
+  "parent": "dgmodules:dgmodules",
+  "display": {
+    "icon": {
+      "id": "dgmodules:chaos_laser_module"
+    },
+    "title": {
+      "translate": "advancements.dgmodules.modules.root.title"
+    },
+    "description": {
+      "translate": "advancements.dgmodules.modules.root.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false,
+    "background": "minecraft:textures/gui/advancements/backgrounds/end.png"
+  },
+  "criteria": {
+    "has_wyvern_hp_damage_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:wyvern_hp_damage_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_wyvern_energy_saver_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:wyvern_energy_saver_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_wyvern_blast_space_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:wyvern_blast_space_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_draconic_hp_damage_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:draconic_hp_damage_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_draconic_energy_saver_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:draconic_energy_saver_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_negative_effect_immunity_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:negative_effect_immunity_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_frame_breaker_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:frame_breaker_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_draconic_blast_space_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:draconic_blast_space_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_chaos_laser_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:chaos_laser_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_cataclysm_arrow_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:cataclysm_arrow_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_dragon_guard_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:dragon_guard_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_phase_shield_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:phase_shield_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_dimension_anchor_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:dimension_anchor_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_chaotic_hp_damage_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:chaotic_hp_damage_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_chaotic_energy_saver_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:chaotic_energy_saver_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_flight_tuner_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:flight_tuner_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_compressed_chaotic_energy_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:compressed_chaotic_energy_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_compressed_chaotic_shield_recovery_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:compressed_chaotic_shield_recovery_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_compressed_chaotic_large_shield_capacity_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:compressed_chaotic_large_shield_capacity_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_compressed_chaotic_damage_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:compressed_chaotic_damage_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_compressed_chaotic_speed_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:compressed_chaotic_speed_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_shield_control_booster_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:shield_control_booster_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_satiety_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:satiety_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_chaotic_blast_space_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:chaotic_blast_space_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_host_integrity_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:host_integrity_module"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_wyvern_hp_damage_module",
+      "has_wyvern_energy_saver_module",
+      "has_wyvern_blast_space_module",
+      "has_draconic_hp_damage_module",
+      "has_draconic_energy_saver_module",
+      "has_negative_effect_immunity_module",
+      "has_frame_breaker_module",
+      "has_draconic_blast_space_module",
+      "has_chaos_laser_module",
+      "has_cataclysm_arrow_module",
+      "has_dragon_guard_module",
+      "has_phase_shield_module",
+      "has_dimension_anchor_module",
+      "has_chaotic_hp_damage_module",
+      "has_chaotic_energy_saver_module",
+      "has_flight_tuner_module",
+      "has_compressed_chaotic_energy_module",
+      "has_compressed_chaotic_shield_recovery_module",
+      "has_compressed_chaotic_large_shield_capacity_module",
+      "has_compressed_chaotic_damage_module",
+      "has_compressed_chaotic_speed_module",
+      "has_shield_control_booster_module",
+      "has_satiety_module",
+      "has_chaotic_blast_space_module",
+      "has_host_integrity_module"
+    ]
+  ]
+}

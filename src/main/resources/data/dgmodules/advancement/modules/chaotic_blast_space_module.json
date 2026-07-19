@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "id": "dgmodules:chaotic_blast_space_module"
+    },
+    "title": {
+      "translate": "advancements.dgmodules.modules.chaotic_blast_space_module.title"
+    },
+    "description": {
+      "translate": "advancements.dgmodules.modules.chaotic_blast_space_module.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_chaotic_blast_space_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:chaotic_blast_space_module"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "dgmodules:modules/chaotic"
+}

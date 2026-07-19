@@ -121,6 +121,10 @@ final class CataclysmChaosOrbLogic {
             }
 
             if (now >= state.expireGameTime()) {
+                // 强制加载 orb 所在区块，确保 discard 不被区块卸载阻断
+                try {
+                    currentLevel.getChunkAt(orb.blockPosition());
+                } catch (Throwable ignored) {}
                 orb.discard();
                 it.remove();
                 continue;

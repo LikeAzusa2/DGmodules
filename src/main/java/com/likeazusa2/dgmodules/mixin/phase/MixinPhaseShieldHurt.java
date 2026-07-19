@@ -1,6 +1,5 @@
 package com.likeazusa2.dgmodules.mixin.phase;
 
-import com.likeazusa2.dgmodules.DGModules;
 import com.likeazusa2.dgmodules.logic.PhaseShieldLogic;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -40,26 +39,9 @@ public abstract class MixinPhaseShieldHurt {
 
         boolean active = PhaseShieldLogic.isActive(sp);
         boolean lethal = newHealth <= 0.0F;
-        DGModules.LOGGER.debug(
-                "[PhaseShield] MixinPhaseShieldHurt#setHealth player={} cur={} new={} lethal={} active={}",
-                sp.getGameProfile().getName(),
-                cur,
-                newHealth,
-                lethal,
-                active
-        );
-
         if (active || (lethal && PhaseShieldLogic.tryActivateEmergency(sp))) {
             PhaseShieldLogic.playShieldHit(sp);
-            if (lethal || active) {
-                PhaseShieldLogic.stabilizeAfterDeathIntercept(sp);
-            }
-            DGModules.LOGGER.debug(
-                    "[PhaseShield] MixinPhaseShieldHurt#setHealth canceled player={} lethal={} active={}",
-                    sp.getGameProfile().getName(),
-                    lethal,
-                    active
-            );
+            PhaseShieldLogic.stabilizeAfterDeathIntercept(sp);
             ci.cancel();
         }
     }
@@ -70,15 +52,7 @@ public abstract class MixinPhaseShieldHurt {
         if (self.level().isClientSide) return;
         if (!(self instanceof ServerPlayer sp)) return;
 
-        DGModules.LOGGER.debug(
-                "[PhaseShield] MixinPhaseShieldHurt#tickDeath player={} hp={} deathTime={} active={}",
-                sp.getGameProfile().getName(),
-                sp.getHealth(),
-                sp.deathTime,
-                PhaseShieldLogic.isActive(sp)
-        );
         if (PhaseShieldLogic.tryInterceptLethalOperation(sp)) {
-            DGModules.LOGGER.debug("[PhaseShield] MixinPhaseShieldHurt#tickDeath canceled player={}", sp.getGameProfile().getName());
             ci.cancel();
         }
     }

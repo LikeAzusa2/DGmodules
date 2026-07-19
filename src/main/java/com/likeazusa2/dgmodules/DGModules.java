@@ -3,6 +3,7 @@ package com.likeazusa2.dgmodules;
 import com.brandon3055.draconicevolution.init.DEModules;
 import com.likeazusa2.dgmodules.client.WeaponHpCutTooltip;
 import com.likeazusa2.dgmodules.logic.DimensionAnchorEvents;
+import com.likeazusa2.dgmodules.logic.HostIntegrityEvents;
 import com.likeazusa2.dgmodules.logic.PlayerCleanupHandler;
 import com.likeazusa2.dgmodules.logic.ServerTickHandler;
 import com.likeazusa2.dgmodules.network.NetworkHandler;
@@ -48,6 +49,7 @@ public class DGModules {
         NeoForge.EVENT_BUS.register(ServerTickHandler.class);
         NeoForge.EVENT_BUS.register(DraconicShieldDomeEvents.class);
         NeoForge.EVENT_BUS.register(DimensionAnchorEvents.class);
+        NeoForge.EVENT_BUS.register(HostIntegrityEvents.class);
         NeoForge.EVENT_BUS.register(PlayerCleanupHandler.class);
 
         // 8) 客户端初始化（只在客户端执行）

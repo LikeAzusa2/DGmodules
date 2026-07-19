@@ -287,7 +287,8 @@ public class ChaosLaserLogic {
                 .inflate(1.0);
 
         if (execute) {
-            for (Entity e : level.getEntities(sp, scanBox, ent -> ent instanceof LivingEntity le && le.isAlive())) {
+            for (Entity e : level.getEntities(sp, scanBox,
+                    ent -> ent instanceof LivingEntity le && DangerousModuleProtection.canAffect(le))) {
                 LivingEntity le = (LivingEntity) e;
                 var hitOpt = le.getBoundingBox().inflate(0.3).clip(eye, finalEnd);
                 if (hitOpt.isEmpty()) continue;
@@ -297,7 +298,8 @@ public class ChaosLaserLogic {
             LivingEntity best = null;
             double bestD2 = Double.MAX_VALUE;
 
-            for (Entity e : level.getEntities(sp, scanBox, ent -> ent instanceof LivingEntity le && le.isAlive())) {
+            for (Entity e : level.getEntities(sp, scanBox,
+                    ent -> ent instanceof LivingEntity le && DangerousModuleProtection.canAffect(le))) {
                 LivingEntity le = (LivingEntity) e;
                 var hitOpt = le.getBoundingBox().inflate(0.3).clip(eye, finalEnd);
                 if (hitOpt.isEmpty()) continue;
@@ -321,6 +323,8 @@ public class ChaosLaserLogic {
     }
 
     private static void kill(LivingEntity le, DamageSource src) {
+        if (!DangerousModuleProtection.canAffect(le)) return;
+
         try {
             le.hurt(src, Float.MAX_VALUE);
         } catch (Throwable ignored) {}

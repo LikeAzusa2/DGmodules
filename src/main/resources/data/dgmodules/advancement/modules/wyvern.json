@@ -1,0 +1,63 @@
+{
+  "display": {
+    "icon": {
+      "id": "dgmodules:wyvern_hp_damage_module"
+    },
+    "title": {
+      "translate": "advancements.dgmodules.modules.wyvern.title"
+    },
+    "description": {
+      "translate": "advancements.dgmodules.modules.wyvern.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "has_wyvern_hp_damage_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:wyvern_hp_damage_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_wyvern_energy_saver_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:wyvern_energy_saver_module"
+            ]
+          }
+        ]
+      }
+    },
+    "has_wyvern_blast_space_module": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "dgmodules:wyvern_blast_space_module"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "dgmodules:modules/root",
+  "requirements": [
+    [
+      "has_wyvern_hp_damage_module",
+      "has_wyvern_energy_saver_module",
+      "has_wyvern_blast_space_module"
+    ]
+  ]
+}
