@@ -14,5 +14,11 @@ public class ServerTickHandler {
         FlightTunerLogic.tick(sp);
         PhaseShieldLogic.tick(sp);
         DimensionAnchorLogic.tick(sp);
+
+        // Staggered fallback scan. Event hooks request immediate scans; this
+        // catches foreign handlers that bypass all normal inventory events.
+        if ((sp.serverLevel().getGameTime() + Math.floorMod(sp.getUUID().hashCode(), 20)) % 20 == 0) {
+            HostIntegrityMonitor.scanPlayer(sp);
+        }
     }
 }

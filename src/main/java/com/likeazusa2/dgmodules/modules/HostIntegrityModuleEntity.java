@@ -44,15 +44,17 @@ public class HostIntegrityModuleEntity extends ModuleEntity<NoData> {
             );
 
     private UUID moduleUuid;
+    private UUID ownerUuid;
     private boolean uuidNeedsPersistence;
 
     public static final Codec<HostIntegrityModuleEntity> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             DEModules.codec().fieldOf("module").forGetter(e -> (Module<?>) e.getModule()),
             Codec.INT.fieldOf("gridx").forGetter(ModuleEntity::getGridX),
             Codec.INT.fieldOf("gridy").forGetter(ModuleEntity::getGridY),
-            UUID_CODEC.optionalFieldOf("uuid").forGetter(e -> Optional.of(e.getModuleUuid()))
-    ).apply(inst, (m, x, y, uuid) -> new HostIntegrityModuleEntity(
-            (Module<NoData>) m, x, y, uuid.orElse(null), uuid.isEmpty())));
+            UUID_CODEC.optionalFieldOf("uuid").forGetter(e -> Optional.of(e.getModuleUuid())),
+            UUID_CODEC.optionalFieldOf("owner").forGetter(e -> Optional.ofNullable(e.getOwnerUuid()))
+    ).apply(inst, (m, x, y, uuid, owner) -> new HostIntegrityModuleEntity(
+            (Module<NoData>) m, x, y, uuid.orElse(null), owner.orElse(null), uuid.isEmpty())));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, HostIntegrityModuleEntity> STREAM_CODEC =
             StreamCodec.composite(
@@ -60,26 +62,41 @@ public class HostIntegrityModuleEntity extends ModuleEntity<NoData> {
                     ByteBufCodecs.INT, ModuleEntity::getGridX,
                     ByteBufCodecs.INT, ModuleEntity::getGridY,
                     UUID_STREAM_CODEC, HostIntegrityModuleEntity::getModuleUuid,
-                    (m, x, y, uuid) -> new HostIntegrityModuleEntity((Module<NoData>) m, x, y, uuid, false)
+                    ByteBufCodecs.optional(UUID_STREAM_CODEC), e -> Optional.ofNullable(e.getOwnerUuid()),
+                    (m, x, y, uuid, owner) -> new HostIntegrityModuleEntity(
+                            (Module<NoData>) m, x, y, uuid, owner.orElse(null), false)
             );
 
     public HostIntegrityModuleEntity(Module<NoData> module) {
-        this(module, 0, 0, UUID.randomUUID(), false);
+        this(module, 0, 0, UUID.randomUUID(), null, false);
     }
 
     public HostIntegrityModuleEntity(Module<NoData> module, int gridX, int gridY) {
-        this(module, gridX, gridY, UUID.randomUUID(), false);
+        this(module, gridX, gridY, UUID.randomUUID(), null, false);
     }
 
     private HostIntegrityModuleEntity(Module<NoData> module, int gridX, int gridY,
-                                      UUID moduleUuid, boolean uuidNeedsPersistence) {
+                                      UUID moduleUuid, UUID ownerUuid, boolean uuidNeedsPersistence) {
         super(module, gridX, gridY);
         this.moduleUuid = moduleUuid == null ? UUID.randomUUID() : moduleUuid;
+        this.ownerUuid = ownerUuid;
         this.uuidNeedsPersistence = uuidNeedsPersistence || moduleUuid == null;
     }
 
     public UUID getModuleUuid() {
         return moduleUuid;
+    }
+
+    public UUID getOwnerUuid() {
+        return ownerUuid;
+    }
+
+    public void setOwnerUuid(UUID ownerUuid) {
+        if (!java.util.Objects.equals(this.ownerUuid, ownerUuid)) {
+            this.ownerUuid = ownerUuid;
+            uuidNeedsPersistence = true;
+            markDirty();
+        }
     }
 
     /**
@@ -103,7 +120,7 @@ public class HostIntegrityModuleEntity extends ModuleEntity<NoData> {
     @Override
     public ModuleEntity<?> copy() {
         return new HostIntegrityModuleEntity((Module<NoData>) this.module, getGridX(), getGridY(),
-                moduleUuid, uuidNeedsPersistence);
+                moduleUuid, ownerUuid, uuidNeedsPersistence);
     }
 
     @Override

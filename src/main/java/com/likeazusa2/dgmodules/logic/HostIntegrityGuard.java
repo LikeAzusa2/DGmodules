@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,7 @@ public final class HostIntegrityGuard {
     private static final IdentityHashMap<ItemStack, Binding> PROTECTED_STACKS = new IdentityHashMap<>();
     private static final IdentityHashMap<ItemStack, ActiveBinding> ACTIVE_STACKS = new IdentityHashMap<>();
     private static final Map<UUID, ItemStack> ACTIVE_MODULE_UUIDS = new HashMap<>();
+    private static final Set<UUID> REPORTED_UUID_CONFLICTS = new HashSet<>();
     private static final IdentityHashMap<NonNullList<?>, ListBinding> INVENTORY_LISTS = new IdentityHashMap<>();
     private static final IdentityHashMap<Object, CurioBinding> CURIO_HANDLERS = new IdentityHashMap<>();
     private static final Map<UUID, Long> LAST_LOG_TICK = new HashMap<>();
@@ -124,6 +126,7 @@ public final class HostIntegrityGuard {
                 detach(uuid);
             }
             ACTIVE_MODULE_UUIDS.clear();
+            REPORTED_UUID_CONFLICTS.clear();
             LAST_LOG_TICK.clear();
         }
     }
@@ -158,6 +161,7 @@ public final class HostIntegrityGuard {
             if (reconcile) {
                 reconcilePlayer(player);
             }
+            HostIntegrityMonitor.requestScan(player);
         }
     }
 
@@ -220,6 +224,9 @@ public final class HostIntegrityGuard {
         if (oldStack == newStack) {
             return false;
         }
+        if (isInternalMutation()) {
+            return false;
+        }
 
         boolean protectedOld = isProtectedStack(oldStack) || hasIntegrityModule(oldStack);
         boolean protectedNew = hasIntegrityModule(newStack);
@@ -252,6 +259,9 @@ public final class HostIntegrityGuard {
         if (!isProtectedStack(oldStack) && !hasIntegrityModule(oldStack)) {
             return false;
         }
+        if (isInternalMutation()) {
+            return false;
+        }
         if (isOwnerAction(binding.player)) {
             return false;
         }
@@ -269,7 +279,7 @@ public final class HostIntegrityGuard {
             }
         }
 
-        if (isOwnerAction(binding.player)) {
+        if (isOwnerAction(binding.player) || isInternalMutation()) {
             return false;
         }
 
@@ -419,7 +429,7 @@ public final class HostIntegrityGuard {
 
     public static boolean shouldBlockItemEntityAssignment(ItemStack stack) {
         Binding binding = getBinding(stack);
-        if (binding == null || isOwnerAction(binding.player)) {
+        if (binding == null || isOwnerAction(binding.player) || isInternalMutation()) {
             return false;
         }
 
@@ -482,7 +492,7 @@ public final class HostIntegrityGuard {
         if (!protectedOld && !protectedNew) {
             return false;
         }
-        if (isOwnerAction(binding.player)) {
+        if (isOwnerAction(binding.player) || isInternalMutation()) {
             return false;
         }
 
@@ -505,7 +515,7 @@ public final class HostIntegrityGuard {
         if (!isProtectedStack(stack) && !hasIntegrityModule(stack)) {
             return false;
         }
-        if (isOwnerAction(binding.player)) {
+        if (isOwnerAction(binding.player) || isInternalMutation()) {
             return false;
         }
 
@@ -528,7 +538,7 @@ public final class HostIntegrityGuard {
                 || !DGConfig.SERVER.hostIntegrityProtectCurios.get()) {
             return false;
         }
-        if (isOwnerAction(player)) {
+        if (isOwnerAction(player) || isInternalMutation()) {
             return false;
         }
         if (!isProtectedStack(from) && !hasIntegrityModule(from)
@@ -544,7 +554,7 @@ public final class HostIntegrityGuard {
                 || !DGConfig.SERVER.hostIntegrityProtectCurios.get()) {
             return false;
         }
-        if (isOwnerAction(player)) {
+        if (isOwnerAction(player) || isInternalMutation()) {
             return false;
         }
         if (!isProtectedStack(stack) && !hasIntegrityModule(stack)) {
@@ -618,10 +628,14 @@ public final class HostIntegrityGuard {
             UUID moduleUuid = integrity.getModuleUuid();
             ItemStack existing = ACTIVE_MODULE_UUIDS.get(moduleUuid);
             if (existing != null && existing != stack) {
-                do {
-                    integrity.regenerateUuid();
-                    moduleUuid = integrity.getModuleUuid();
-                } while (ACTIVE_MODULE_UUIDS.containsKey(moduleUuid));
+                // Never legitimize a copied host by assigning the copy a new
+                // identity. The UUID monitor clears later authoritative
+                // instances; pre-existing conflicts stay visible for audit.
+                if (REPORTED_UUID_CONFLICTS.add(moduleUuid)) {
+                    DGModules.LOGGER.error(
+                            "[HostIntegrity] duplicate stable UUID {} detected; identity was not regenerated",
+                            moduleUuid);
+                }
             }
 
             if (integrity.needsUuidPersistence()) {
@@ -698,7 +712,7 @@ public final class HostIntegrityGuard {
         if (moduleUuid != null || hasIntegrityModule(stack)) {
             PROTECTED_STACKS.put(stack, new Binding(player, slot.getName(), moduleUuid));
             if (moduleUuid != null) {
-                ACTIVE_MODULE_UUIDS.put(moduleUuid, stack);
+                ACTIVE_MODULE_UUIDS.putIfAbsent(moduleUuid, stack);
             }
         }
     }
@@ -712,7 +726,7 @@ public final class HostIntegrityGuard {
                 if (moduleUuid != null || hasIntegrityModule(stack)) {
                     PROTECTED_STACKS.put(stack, new Binding(player, "inventory", moduleUuid));
                     if (moduleUuid != null) {
-                        ACTIVE_MODULE_UUIDS.put(moduleUuid, stack);
+                        ACTIVE_MODULE_UUIDS.putIfAbsent(moduleUuid, stack);
                     }
                 }
             }
@@ -740,7 +754,7 @@ public final class HostIntegrityGuard {
                         if (moduleUuid != null || hasIntegrityModule(stack)) {
                             PROTECTED_STACKS.put(stack, new Binding(player, identifier + ":" + i, moduleUuid));
                             if (moduleUuid != null) {
-                                ACTIVE_MODULE_UUIDS.put(moduleUuid, stack);
+                                ACTIVE_MODULE_UUIDS.putIfAbsent(moduleUuid, stack);
                             }
                         }
                     }

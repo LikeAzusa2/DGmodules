@@ -187,5 +187,6 @@
   "tooltip.dgmodules.chaos_crystal_breaker.countdown": "Detonation delay: %s seconds",
   "tooltip.dgmodules.chaos_crystal_breaker.radius": "Chaos Guardian damage radius: %s blocks",
   "tooltip.dgmodules.chaos_crystal_breaker.use": "Right-click one of the 14 guardian crystal entities or its support block to install it. Consumed on installation.",
-  "block.dgmodules.dont_ignite": "Do Not Ignite"
+  "block.dgmodules.dont_ignite": "Do Not Ignite",
+  "tooltip.dgmodules.host_integrity.uuid": "Stable UUID: %s"
 }

@@ -5,7 +5,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import top.theillusivec4.curios.api.event.CurioCanEquipEvent;
 import top.theillusivec4.curios.api.event.CurioCanUnequipEvent;
@@ -22,6 +25,9 @@ public final class HostIntegrityEvents {
     @SubscribeEvent
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         reconcile(event.getEntity());
+        if (event.getEntity() instanceof ServerPlayer player) {
+            player.getServer().execute(() -> HostIntegrityMonitor.deliverPendingReturns(player));
+        }
     }
 
     @SubscribeEvent
@@ -90,11 +96,37 @@ public final class HostIntegrityEvents {
     @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event) {
         HostIntegrityGuard.clearAll();
+        HostIntegrityMonitor.clearRuntimeState();
+    }
+
+    @SubscribeEvent
+    public static void onEntityJoin(EntityJoinLevelEvent event) {
+        HostIntegrityMonitor.onItemEntityJoin(event);
+    }
+
+    @SubscribeEvent
+    public static void onEntityLeave(EntityLeaveLevelEvent event) {
+        if (event.getEntity() instanceof net.minecraft.world.entity.item.ItemEntity itemEntity) {
+            HostIntegrityMonitor.onItemEntityLeave(itemEntity);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onItemPickupPre(ItemEntityPickupEvent.Pre event) {
+        HostIntegrityMonitor.onPickupPre(event);
+    }
+
+    @SubscribeEvent
+    public static void onItemPickupPost(ItemEntityPickupEvent.Post event) {
+        if (event.getPlayer() instanceof ServerPlayer player) {
+            HostIntegrityMonitor.requestScan(player);
+        }
     }
 
     private static void reconcile(LivingEntity entity) {
         if (entity instanceof ServerPlayer serverPlayer) {
             HostIntegrityGuard.requestReconcile(serverPlayer);
+            HostIntegrityMonitor.requestScan(serverPlayer);
         }
     }
 }

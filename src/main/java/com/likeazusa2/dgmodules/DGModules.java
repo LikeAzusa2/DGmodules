@@ -1,6 +1,7 @@
 package com.likeazusa2.dgmodules;
 
 import com.brandon3055.draconicevolution.init.DEModules;
+import com.likeazusa2.dgmodules.client.HostIntegrityTooltip;
 import com.likeazusa2.dgmodules.client.WeaponHpCutTooltip;
 import com.likeazusa2.dgmodules.logic.DimensionAnchorEvents;
 import com.likeazusa2.dgmodules.logic.HostIntegrityEvents;
@@ -73,6 +74,7 @@ public class DGModules {
     private static class ClientOnly {
         static void init(IEventBus modBus) {
             NeoForge.EVENT_BUS.register(WeaponHpCutTooltip.class);
+            NeoForge.EVENT_BUS.register(HostIntegrityTooltip.class);
         }
     }
 }

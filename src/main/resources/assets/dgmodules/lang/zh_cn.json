@@ -189,5 +189,6 @@
   "tooltip.dgmodules.chaos_crystal_breaker.radius": "混沌龙伤害范围：%s 格",
   "tooltip.dgmodules.chaos_crystal_breaker.use": "右键14个混沌水晶实体或其下方方块安装装置，安装后消耗道具。",
 
-  "block.dgmodules.dont_ignite": "不要点燃"
+  "block.dgmodules.dont_ignite": "不要点燃",
+  "tooltip.dgmodules.host_integrity.uuid": "稳定 UUID：%s"
 }

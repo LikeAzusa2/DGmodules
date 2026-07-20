@@ -1,5 +1,21 @@
 # DGmodules 更新日志
 
+## 2026-07-20
+
+### 维护：GitHub Actions Node.js 24 兼容
+
+- 更新 `.github/workflows/build.yml`：将 `actions/checkout` 升级至 `v6`、`actions/setup-java` 升级至 `v5`、`gradle/actions/setup-gradle` 升级至 `v6`，使 GitHub 构建使用 Node.js 24 运行时，不再触发 Node.js 20 弃用警告；JDK 版本仍保持为 21，Gradle 构建命令不变。
+
+### 重做：稳定模块 UUID 监测与所有者归还
+
+- 修改 `HostIntegrityModuleEntity` 的 `CODEC`、`STREAM_CODEC` 和复制逻辑，在原稳定 UUID 外持久化绑定玩家 UUID；旧宿主首次被服务端玩家扫描时自动绑定，复制出的宿主不会因 UUID 冲突而重新编号。
+- 新增 `HostIntegrityLedger`，以世界 SavedData 注册名 `dgmodules_host_integrity` 持久化稳定 UUID、绑定玩家、权威位置、首次发现序号和离线待归还物品，服务器重启后仍能判断原宿主及后出现的副本。
+- 新增 `HostIntegrityMonitor`，通过玩家操作、登录、装备与 Curios 变化、物品实体加载和拾取事件即时检查，并按玩家错峰进行周期兜底扫描；范围包含背包、快捷栏、护甲、副手、光标物品、Curios 普通栏位和外观栏位。
+- 同一玩家出现多个相同稳定 UUID 宿主时保留账本记录的权威位置并清除后出现的宿主；其他玩家无法拾取或持有已绑定宿主，错误获得的宿主会从其栏位移除并尝试归还所有者。
+- 所有者在线且背包有空位时直接归还；背包已满时在玩家视线前方生成无重力、发光、无限寿命且仅允许所有者拾取的浮空宿主；所有者离线时写入待归还队列并在下次登录处理。
+- 修改 `mixins/dgmodules.json`，继续启用原有物品栏、Curios、ItemEntity、丢弃和组件写入拦截，阻止非玩家本人直接更改、移除或丢弃受保护宿主；服务端 UUID 监测作为第二层校验，清除后出现的同 UUID 宿主直到只剩一个权威实例。
+- 新增 `HostIntegrityTooltip` 及语言键 `tooltip.dgmodules.host_integrity.uuid`，受保护宿主 tooltip 显示完整稳定 UUID，便于与服务端清理、拒绝拾取和归还日志核对。
+
 ## 2026-07-19
 
 ### 新增：混沌爆破装置
