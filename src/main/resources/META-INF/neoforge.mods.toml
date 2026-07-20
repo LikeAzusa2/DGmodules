@@ -39,5 +39,12 @@ versionRange="[9.5.1,)"
 ordering="AFTER"
 side="BOTH"
 
+[[dependencies.dgmodules]]
+modId="jei"
+mandatory=false
+versionRange="[19.27,)"
+ordering="AFTER"
+side="CLIENT"
+
 [[mixins]]
 config="mixins/dgmodules.json"

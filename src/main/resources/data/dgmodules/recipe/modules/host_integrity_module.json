@@ -51,12 +51,6 @@
       "ingredient": {
         "item": "draconicevolution:draconic_energy_core"
       }
-    },
-    {
-      "consume": true,
-      "ingredient": {
-        "item": "dgmodules:shield_control_booster_module"
-      }
     }
   ],
   "result": {

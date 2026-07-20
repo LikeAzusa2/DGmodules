@@ -6,6 +6,15 @@
 
 - 更新 `.github/workflows/build.yml`：将 `actions/checkout` 升级至 `v6`、`actions/setup-java` 升级至 `v5`、`gradle/actions/setup-gradle` 升级至 `v6`，使 GitHub 构建使用 Node.js 24 运行时，不再触发 Node.js 20 弃用警告；JDK 版本仍保持为 21，Gradle 构建命令不变。
 
+### 修复：JEI 可选依赖的 GitHub 构建
+
+- 修改 `build.gradle`，使用 `mezz.jei:jei-1.21.1-neoforge-api:19.27.0.340` 的 `compileOnly` 依赖和 BlameJared Maven 仓库，移除对 `run/mods` 本地 JEI JAR 的依赖；GitHub 干净环境可以编译 JEI 插件，发布物仍不会携带 JEI。
+- 修改 `META-INF/neoforge.mods.toml`，将 JEI 注册为客户端可选依赖；未安装 JEI 时 DGmodules 仍可加载，只是不注册自定义 JEI 配方分类。
+
+### 调整：护主模块合成配方
+
+- 修改 `data/dgmodules/recipe/modules/host_integrity_module.json`，移除 `dgmodules:shield_control_booster_module` 消耗材料；护主模块不再要求额外消耗护盾控制增幅模块。
+
 ### 重做：稳定模块 UUID 监测与所有者归还
 
 - 修改 `HostIntegrityModuleEntity` 的 `CODEC`、`STREAM_CODEC` 和复制逻辑，在原稳定 UUID 外持久化绑定玩家 UUID；旧宿主首次被服务端玩家扫描时自动绑定，复制出的宿主不会因 UUID 冲突而重新编号。
