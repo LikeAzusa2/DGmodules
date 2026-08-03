@@ -10,6 +10,7 @@ import com.likeazusa2.dgmodules.modules.HostIntegrityModuleEntity;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -50,6 +51,7 @@ public final class HostIntegrityGuard {
     private static final IdentityHashMap<NonNullList<?>, ListBinding> INVENTORY_LISTS = new IdentityHashMap<>();
     private static final IdentityHashMap<Object, CurioBinding> CURIO_HANDLERS = new IdentityHashMap<>();
     private static final Map<UUID, Long> LAST_LOG_TICK = new HashMap<>();
+    private static final Map<UUID, Long> LAST_DROP_NOTICE_TICK = new HashMap<>();
 
     private static final ThreadLocal<ActionState> ACTION = new ThreadLocal<>();
     private static final ThreadLocal<Integer> INTERNAL_MUTATION_DEPTH =
@@ -116,6 +118,7 @@ public final class HostIntegrityGuard {
         if (player != null) {
             synchronized (LOCK) {
                 detach(player.getUUID());
+                LAST_DROP_NOTICE_TICK.remove(player.getUUID());
             }
         }
     }
@@ -128,6 +131,7 @@ public final class HostIntegrityGuard {
             ACTIVE_MODULE_UUIDS.clear();
             REPORTED_UUID_CONFLICTS.clear();
             LAST_LOG_TICK.clear();
+            LAST_DROP_NOTICE_TICK.clear();
         }
     }
 
@@ -407,24 +411,43 @@ public final class HostIntegrityGuard {
             return false;
         }
         ItemStack selected = player.getInventory().getSelected();
-        if (!isProtectedStack(selected) || isOwnerAction(player)) {
+        if (!isDropProtectedStack(selected) || isInternalMutation()) {
             return false;
         }
 
         logBlocked(player, "selected item drop", "mainhand");
+        notifyDropBlocked(player);
         return true;
     }
 
     public static boolean shouldBlockPlayerDrop(Player player, ItemStack stack) {
         if (!(player instanceof ServerPlayer serverPlayer)
-                || !isProtectedStack(stack)
-                || isOwnerAction(serverPlayer)) {
+                || !isDropProtectedStack(stack)
+                || isInternalMutation()) {
             return false;
         }
 
         Binding binding = getBinding(stack);
         logBlocked(serverPlayer, "item entity drop", binding == null ? "unknown" : binding.slotName);
+        notifyDropBlocked(serverPlayer);
         return true;
+    }
+
+    private static boolean isDropProtectedStack(ItemStack stack) {
+        return isProtectedStack(stack) || hasIntegrityModule(stack);
+    }
+
+    private static void notifyDropBlocked(ServerPlayer player) {
+        long now = player.serverLevel().getGameTime();
+        synchronized (LOCK) {
+            long last = LAST_DROP_NOTICE_TICK.getOrDefault(player.getUUID(), Long.MIN_VALUE);
+            if (last == now) {
+                return;
+            }
+            LAST_DROP_NOTICE_TICK.put(player.getUUID(), now);
+        }
+        player.displayClientMessage(
+                Component.translatable("message.dgmodules.host_integrity.drop_blocked"), true);
     }
 
     public static boolean shouldBlockItemEntityAssignment(ItemStack stack) {

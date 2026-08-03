@@ -79,6 +79,7 @@
   "module.dgmodules.host_integrity.desc": "谁想替换、丢弃或篡改这件物品，先问过它。",
   "module.dgmodules.host_integrity.scope": "只保护安装它的这一件宿主物品。",
   "module.dgmodules.host_integrity.identity": "每个宿主拥有独立的稳定身份，模块安装上限：1。",
+  "message.dgmodules.host_integrity.drop_blocked": "稳定模块阻止了物品的失去",
 
   "item.dgmodules.wyvern_hp_damage_module": "飞龙生命削减模块",
   "item.dgmodules.draconic_hp_damage_module": "神龙生命削减模块",

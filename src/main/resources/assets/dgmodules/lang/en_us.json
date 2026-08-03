@@ -79,6 +79,7 @@
   "module.dgmodules.host_integrity.desc": "Anyone trying to replace, drop, or tamper with this host item will have to get past it.",
   "module.dgmodules.host_integrity.scope": "Protects only the one host item carrying this module.",
   "module.dgmodules.host_integrity.identity": "Each host receives a unique stable identity; install limit: 1.",
+  "message.dgmodules.host_integrity.drop_blocked": "The Host Guard Module prevented the item from being lost.",
 
   "item.dgmodules.wyvern_hp_damage_module": "Wyvern Life Reduction Module",
   "item.dgmodules.draconic_hp_damage_module": "Draconic Life Reduction Module",
